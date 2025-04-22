@@ -14,19 +14,26 @@ var upgrader = websocket.Upgrader{
 }
 
 func HandleWs(w http.ResponseWriter, r *http.Request) {
+	// Try to get roomId and userName from path variables first
 	vars := mux.Vars(r)
 	roomId := vars["roomId"]
 	userName := vars["userName"]
+
+	// If not found in path variables, try query parameters
+	if roomId == "" || userName == "" {
+		roomId = r.URL.Query().Get("roomId")
+		userName = r.URL.Query().Get("userName")
+	}
 
 	if roomId == "" || userName == "" {
 		http.Error(w, "Room ID and username are required", http.StatusBadRequest)
 		return
 	}
 
+	// Get or create the room
 	room, ok := game.GetRoom(roomId)
 	if !ok {
-		http.Error(w, "Room not found", http.StatusNotFound)
-		return
+		room = game.CreateRoom()
 	}
 
 	conn, err := upgrader.Upgrade(w, r, nil)

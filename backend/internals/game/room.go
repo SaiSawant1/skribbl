@@ -1,6 +1,8 @@
 package game
 
 import (
+	"log"
+
 	"github.com/google/uuid"
 )
 
@@ -28,6 +30,7 @@ func (r *Room) run() {
 		select {
 		case client := <-r.Register:
 			r.Clients[client] = true
+			log.Printf("Client added to room %s", r.RoomId)
 		case client := <-r.Unregister:
 			delete(r.Clients, client)
 			close(client.Send)
@@ -36,9 +39,7 @@ func (r *Room) run() {
 			}
 		case msg := <-r.Broadcast:
 			for client := range r.Clients {
-				if client.UserName != msg.UserName {
-					client.Send <- msg
-				}
+				client.Send <- msg
 			}
 		}
 	}

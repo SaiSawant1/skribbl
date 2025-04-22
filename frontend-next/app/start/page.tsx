@@ -35,7 +35,13 @@ export default function StartPage() {
     const res = await axios.post("http://localhost:8080/create-room", {
       data: "",
     });
-    console.log(res);
+    const roomId = res.data.roomId;
+    if (userName) {
+      localStorage.setItem("userName", userName);
+    }
+    if (roomId) {
+      router.push(`/${roomId}`);
+    }
   };
   const onJoinRoom = () => {
     console.log(userName);
@@ -71,7 +77,9 @@ export default function StartPage() {
           <Button
             onClick={onCreateRoom}
             className="w-full font-semibold bg-violet-300 text-lg py-3 hover:bg-violet-500"
-            disabled={error === undefined ? false : true}
+            disabled={error === undefined || userName === undefined
+              ? false
+              : true}
           >
             Start Game
           </Button>
