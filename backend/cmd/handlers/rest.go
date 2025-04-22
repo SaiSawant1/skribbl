@@ -34,6 +34,7 @@ func CreateRoom(w http.ResponseWriter, r *http.Request) {
 		log.Printf("Error encoding response: %v", err)
 		http.Error(w, "Internal server error", http.StatusInternalServerError)
 	}
+	log.Printf("ROOM CREATED roomID: %s", room.RoomId)
 
 }
 

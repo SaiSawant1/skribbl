@@ -4,6 +4,7 @@ import { Input } from "@/components/ui/input";
 import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
 import { ChangeEvent, useState } from "react";
+import axios from "axios";
 
 export default function StartPage() {
   const router = useRouter();
@@ -30,8 +31,11 @@ export default function StartPage() {
     }
   };
 
-  const onCreateRoom = () => {
-    console.log(userName);
+  const onCreateRoom = async () => {
+    const res = await axios.post("http://localhost:8080/create-room", {
+      data: "",
+    });
+    console.log(res);
   };
   const onJoinRoom = () => {
     console.log(userName);
