@@ -46,7 +46,7 @@ export default function ChatBox(
             key={index}
           >
             <span className="font-medium">{msg.userName}:</span>
-            <span>{msg.userName}</span>
+            <span>{msg.data.message}</span>
           </div>
         ))}
         <div ref={messagesEndRef} />

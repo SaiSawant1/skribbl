@@ -43,9 +43,15 @@ export default function StartPage() {
       router.push(`/${roomId}`);
     }
   };
-  const onJoinRoom = () => {
-    console.log(userName);
-    console.log(roomId);
+  const onJoinRoom = async () => {
+    const res = await axios.post("http://localhost:8080/join-room", {
+      roomId: roomId,
+      userName: userName,
+    });
+    if (userName && res.status === 200) {
+      localStorage.setItem("userName", userName);
+    }
+    router.push(`/${roomId}`);
   };
 
   return (

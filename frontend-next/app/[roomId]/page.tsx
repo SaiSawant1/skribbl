@@ -58,10 +58,12 @@ export default function GamePage() {
 
   return (
     <div className="flex flex-col h-screen bg-gray-100">
-      {roomId}
-      {userName}
-      {error}
-      {isConnected == true ? <div>live</div> : <div>not live</div>}
+      <div className="flex flex-col">
+        <div>room id: {roomId}</div>
+        <div>user name: {userName}</div>
+        {isConnected == true ? <div>live</div> : <div>not live</div>}
+        {error}
+      </div>
       <div>
         <ChatBox
           onSendMessage={onSendMessag}
