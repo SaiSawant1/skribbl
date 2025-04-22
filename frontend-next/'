@@ -57,7 +57,7 @@ export default function GamePage() {
   };
 
   return (
-    <div className="flex flex-col h-full">
+    <div className="flex flex-col h-full bg-gray-100">
       <div className="flex flex-col">
         <div>room id: {roomId}</div>
         <div>user name: {userName}</div>
