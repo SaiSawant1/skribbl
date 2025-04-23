@@ -13,6 +13,7 @@ type Room struct {
 	CanvasBroadcast chan CanvasMessagePayload
 	Register        chan *Client
 	Unregister      chan *Client
+	Game            *Game
 }
 
 func NewRoom() *Room {
@@ -24,6 +25,7 @@ func NewRoom() *Room {
 		CanvasBroadcast: make(chan CanvasMessagePayload),
 		Register:        make(chan *Client),
 		Unregister:      make(chan *Client),
+		Game:            NewGame(),
 	}
 }
 
