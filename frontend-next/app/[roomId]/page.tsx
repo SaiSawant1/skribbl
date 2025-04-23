@@ -3,14 +3,17 @@
 import ChatBox from "@/components/ChatBox";
 import PlayersList from "@/components/PlayersList";
 import DrawingCanvas from "@/components/DrawingCanvas";
+import WordDisplay from "@/components/WordDisplay";
 import { useWebSocket } from "@/hooks/useWebsocket";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 
 export default function GamePage() {
   const { error, isConnected, messages, onSendMessage } = useWebSocket();
   const { roomId } = useParams();
+  const router = useRouter();
   const userName = localStorage.getItem("userName");
   if (!userName) {
+    router.push("/start");
     return;
   }
 
@@ -21,8 +24,11 @@ export default function GamePage() {
   ];
 
   // Temporary mock functions for DrawingCanvas
-  const handleDraw = () => { };
-  const handleClear = () => { };
+  const handleDraw = () => {};
+  const handleClear = () => {};
+
+  // Temporary mock word
+  const currentWord = "Apple";
 
   return (
     <div className="flex flex-col h-screen bg-gray-100 dark:bg-gray-900">
@@ -38,10 +44,11 @@ export default function GamePage() {
                 Player: {userName}
               </span>
               <span
-                className={`px-2 py-1 rounded-full text-sm ${isConnected
+                className={`px-2 py-1 rounded-full text-sm ${
+                  isConnected
                     ? "bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200"
                     : "bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200"
-                  }`}
+                }`}
               >
                 {isConnected ? "Connected" : "Disconnected"}
               </span>
@@ -60,6 +67,7 @@ export default function GamePage() {
 
           {/* Middle Column - Drawing Canvas */}
           <div className="w-full lg:w-2/4 bg-white dark:bg-gray-800 rounded-lg shadow-md p-2 sm:p-4">
+            <WordDisplay word={currentWord} isDrawing={false} />
             <DrawingCanvas
               isDrawing={false}
               onDraw={handleDraw}
@@ -88,4 +96,3 @@ export default function GamePage() {
     </div>
   );
 }
-

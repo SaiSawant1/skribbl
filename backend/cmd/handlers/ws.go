@@ -33,7 +33,8 @@ func HandleWs(w http.ResponseWriter, r *http.Request) {
 	// Get or create the room
 	room, ok := game.GetRoom(roomId)
 	if !ok {
-		room = game.CreateRoom()
+		http.Error(w, "No Room Found", http.StatusBadRequest)
+		return
 	}
 
 	conn, err := upgrader.Upgrade(w, r, nil)
