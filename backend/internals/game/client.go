@@ -1,6 +1,7 @@
 package game
 
 import (
+	"encoding/json"
 	"log"
 	"time"
 
@@ -8,18 +9,20 @@ import (
 )
 
 type Client struct {
-	UserName string `json:"userName"`
-	Conn     *websocket.Conn
-	Send     chan Message
-	Room     *Room
+	UserName   string `json:"userName"`
+	Conn       *websocket.Conn
+	ChatSend   chan ChatMessagePayload
+	CanvasSend chan CanvasMessagePayload
+	Room       *Room
 }
 
 func NewClient(conn *websocket.Conn, room *Room, userName string) *Client {
 	return &Client{
-		UserName: userName,
-		Conn:     conn,
-		Send:     make(chan Message, 256), // Buffered channel to prevent blocking
-		Room:     room,
+		UserName:   userName,
+		Conn:       conn,
+		ChatSend:   make(chan ChatMessagePayload, 256), // Buffered channel to prevent blocking
+		CanvasSend: make(chan CanvasMessagePayload, 256),
+		Room:       room,
 	}
 }
 
@@ -37,16 +40,27 @@ func (c *Client) Read() {
 	})
 
 	for {
-		var msg Message
-		if err := c.Conn.ReadJSON(&msg); err != nil {
+		_, msg, err := c.Conn.ReadMessage()
+		if err != nil {
 			if websocket.IsUnexpectedCloseError(err, websocket.CloseGoingAway, websocket.CloseAbnormalClosure) {
 				log.Printf("WebSocket read error: %v", err)
 			}
 			break
 		}
+		var basePayload BasePayload
+		if err := json.Unmarshal(msg, &basePayload); err != nil {
+			log.Printf("Failed to parse the message")
+			break
+		}
 
 		// Process the message
-		c.Room.Broadcast <- msg
+		if basePayload.Type == "chat" {
+			c.Room.ChatBroadcast <- basePayload.ConvertMessageToChatPayload(msg)
+		} else {
+			c.Room.CanvasBroadcast <- basePayload.ConvertMessageToCanvasPayload(msg)
+
+		}
+
 	}
 }
 
@@ -59,13 +73,22 @@ func (c *Client) Write() {
 
 	for {
 		select {
-		case msg, ok := <-c.Send:
+		case msg, ok := <-c.ChatSend:
 			if !ok {
 				// Channel was closed
 				c.Conn.WriteMessage(websocket.CloseMessage, []byte{})
 				return
 			}
-
+			if err := c.Conn.WriteJSON(msg); err != nil {
+				log.Printf("WebSocket write error: %v", err)
+				return
+			}
+		case msg, ok := <-c.CanvasSend:
+			if !ok {
+				// Channel was closed
+				c.Conn.WriteMessage(websocket.CloseMessage, []byte{})
+				return
+			}
 			if err := c.Conn.WriteJSON(msg); err != nil {
 				log.Printf("WebSocket write error: %v", err)
 				return

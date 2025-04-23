@@ -2,25 +2,56 @@ package game
 
 import (
 	"encoding/json"
+	"log"
 	"time"
 )
 
-type Message struct {
+type BasePayload struct {
 	UserName string          `json:"userName"`
 	Data     json.RawMessage `json:"data"`
 	Type     string          `json:"type"`
+	IsHidden bool            `json:"isHidden"`
 }
 
-type DrawPayload struct {
+type ChatData struct {
+	UserName string    `json:"userName"`
+	Message  string    `json:"message"`
+	Time     time.Time `json:"time"`
+}
+
+type CanvasData struct {
 	X     float64 `json:"x"`
-	Y     float64 `json:"Y"`
+	Y     float64 `json:"y"`
 	Color string  `json:"color"`
 	Tool  string  `json:"tool"`
 	Size  float64 `json:"size"`
 }
 
-type GuessPayload struct {
-	UserName string    `json:"userName"`
-	Message  string    `json:"message"`
-	Time     time.Time `json:"time"`
+type ChatMessagePayload struct {
+	UserName string   `json:"userName"`
+	Data     ChatData `json:"data"`
+	Type     string   `json:"type"`
+	IsHidden bool     `json:"isHidden"`
+}
+
+type CanvasMessagePayload struct {
+	UserName string     `json:"userName"`
+	Data     CanvasData `json:"data"`
+	Type     string     `json:"type"`
+	IsHidden bool       `json:"isHidden"`
+}
+
+func (m *BasePayload) ConvertMessageToChatPayload(p []byte) ChatMessagePayload {
+	var chatMessagePayload ChatMessagePayload
+	if err := json.Unmarshal(p, &chatMessagePayload); err != nil {
+		log.Printf("Failed to parse the chat message")
+	}
+	return chatMessagePayload
+}
+func (m *BasePayload) ConvertMessageToCanvasPayload(p []byte) CanvasMessagePayload {
+	var canvasMessagePayload CanvasMessagePayload
+	if err := json.Unmarshal(p, &canvasMessagePayload); err != nil {
+		log.Printf("Failed to parse the canvas message")
+	}
+	return canvasMessagePayload
 }

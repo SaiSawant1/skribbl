@@ -12,9 +12,6 @@ import (
 )
 
 func TestHandleWs(t *testing.T) {
-	// Create a test room
-	room := game.CreateRoom()
-
 	// Create a test server
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		HandleWs(w, r)
@@ -30,15 +27,9 @@ func TestHandleWs(t *testing.T) {
 	}{
 		{
 			name:           "Valid connection",
-			roomId:         room.RoomId,
+			roomId:         "test-room",
 			userName:       "test-user",
 			expectedStatus: http.StatusSwitchingProtocols,
-		},
-		{
-			name:           "Non-existent room",
-			roomId:         "non-existent",
-			userName:       "test-user",
-			expectedStatus: http.StatusNotFound,
 		},
 		{
 			name:           "Missing room ID",
@@ -48,7 +39,7 @@ func TestHandleWs(t *testing.T) {
 		},
 		{
 			name:           "Missing username",
-			roomId:         room.RoomId,
+			roomId:         "test-room",
 			userName:       "",
 			expectedStatus: http.StatusBadRequest,
 		},
@@ -84,9 +75,6 @@ func TestHandleWs(t *testing.T) {
 }
 
 func TestWebSocketCommunication(t *testing.T) {
-	// Create a test room
-	room := game.CreateRoom()
-
 	// Create a test server
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		HandleWs(w, r)
@@ -94,36 +82,75 @@ func TestWebSocketCommunication(t *testing.T) {
 	defer server.Close()
 
 	// Connect to WebSocket
-	wsURL := "ws" + server.URL[4:] + "/ws/" + room.RoomId + "?userName=test-user"
+	wsURL := "ws" + server.URL[4:] + "/ws/test-room?userName=test-user"
 	conn, _, err := websocket.DefaultDialer.Dial(wsURL, nil)
 	if err != nil {
 		t.Fatalf("Failed to connect: %v", err)
 	}
 	defer conn.Close()
 
-	// Send a test message
-	testMsg := game.Message{
+	// Send a test chat message
+	chatMsg := game.ChatMessagePayload{
 		UserName: "test-user",
-		Type:     "test",
-		Data:     []byte(`{"test": "data"}`),
+		Type:     "chat",
+		Data: game.ChatData{
+			UserName: "test-user",
+			Message:  "Hello!",
+			Time:     time.Now(),
+		},
 	}
-	if err := conn.WriteJSON(testMsg); err != nil {
-		t.Fatalf("Failed to write message: %v", err)
+	if err := conn.WriteJSON(chatMsg); err != nil {
+		t.Fatalf("Failed to write chat message: %v", err)
 	}
 
-	// Wait for message to be processed
+	// Send a test canvas message
+	canvasMsg := game.CanvasMessagePayload{
+		UserName: "test-user",
+		Type:     "canvas",
+		Data: game.CanvasData{
+			X:     100,
+			Y:     100,
+			Color: "#000000",
+			Tool:  "pen",
+			Size:  2,
+		},
+	}
+	if err := conn.WriteJSON(canvasMsg); err != nil {
+		t.Fatalf("Failed to write canvas message: %v", err)
+	}
+
+	// Wait for messages to be processed
 	time.Sleep(100 * time.Millisecond)
 
-	// Verify room received the message
+	// Get the room to verify messages were processed
+	room, exists := game.GetRoom("test-room")
+	if !exists {
+		t.Fatal("Expected room to exist")
+	}
+
+	// Verify chat message was processed
 	select {
-	case msg := <-room.Broadcast:
-		if msg.UserName != testMsg.UserName {
-			t.Errorf("Expected username %s, got %s", testMsg.UserName, msg.UserName)
+	case msg := <-room.ChatBroadcast:
+		if msg.UserName != chatMsg.UserName {
+			t.Errorf("Expected username %s, got %s", chatMsg.UserName, msg.UserName)
 		}
-		if msg.Type != testMsg.Type {
-			t.Errorf("Expected type %s, got %s", testMsg.Type, msg.Type)
+		if msg.Data.Message != chatMsg.Data.Message {
+			t.Errorf("Expected message %s, got %s", chatMsg.Data.Message, msg.Data.Message)
 		}
 	default:
-		t.Error("Expected message to be broadcasted to room")
+		t.Error("Expected chat message to be broadcasted to room")
+	}
+
+	// Verify canvas message was processed
+	select {
+	case msg := <-room.CanvasBroadcast:
+		if msg.UserName != canvasMsg.UserName {
+			t.Errorf("Expected username %s, got %s", canvasMsg.UserName, msg.UserName)
+		}
+		if msg.Data.X != canvasMsg.Data.X {
+			t.Errorf("Expected X %f, got %f", canvasMsg.Data.X, msg.Data.X)
+		}
+	default:
+		t.Error("Expected canvas message to be broadcasted to room")
 	}
 }
