@@ -41,6 +41,14 @@ type CanvasMessagePayload struct {
 	IsHidden bool       `json:"isHidden"`
 }
 
+// Server Messages to control the game
+
+type WordPickPayload struct {
+	Type     string   `json:"type"`
+	Words    []string `json:"words"`
+	UserName string   `json:"userName"`
+}
+
 func (m *BasePayload) ConvertMessageToChatPayload(p []byte) ChatMessagePayload {
 	var chatMessagePayload ChatMessagePayload
 	if err := json.Unmarshal(p, &chatMessagePayload); err != nil {

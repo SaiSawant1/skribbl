@@ -18,7 +18,7 @@ func (q *Queue[T]) Dequeue() (T, bool) {
 	return item, true
 }
 
-func (q *Queue[T]) isEmpty() bool {
+func (q *Queue[T]) IsEmpty() bool {
 	if len(q.items) == 0 {
 		return true
 	}

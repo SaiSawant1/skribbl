@@ -55,12 +55,18 @@ func JoinRoom(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	_, ok := game.GetRoom(req.RoomId)
+	room, ok := game.GetRoom(req.RoomId)
 	if !ok {
 		http.Error(w, "Room not found", http.StatusNotFound)
 		return
 	}
 
-	// TODO: Add logic to check if room is full or if username is already taken
+	for key, _ := range room.Clients {
+		if key.UserName == req.UserName {
+			http.Error(w, "User Name Already Take Choose different", http.StatusBadRequest)
+			return
+		}
+	}
+
 	w.WriteHeader(http.StatusOK)
 }
