@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { DoodleBackground } from "@/components/dooble-background";
 import { ThemeProvider } from "@/components/theme-provider";
+import { UserStoreProvider } from "@/components/user-store-provider";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -36,7 +37,9 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           <DoodleBackground />
-          {children}
+          <UserStoreProvider>
+            {children}
+          </UserStoreProvider>
         </ThemeProvider>
       </body>
     </html>

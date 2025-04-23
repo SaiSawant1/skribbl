@@ -5,12 +5,14 @@ import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
 import { ChangeEvent, useState } from "react";
 import axios from "axios";
+import { useUserStore } from "@/components/user-store-provider";
 
 export default function StartPage() {
   const router = useRouter();
-  const [userName, setUserName] = useState<string>();
-  const [roomId, setRoomId] = useState<string>();
   const [error, setError] = useState<string | undefined>(undefined);
+  const { userName, setUserName, roomId, setRoomId } = useUserStore((state) =>
+    state
+  );
 
   const onUserName = (e: ChangeEvent<HTMLInputElement>) => {
     setError(undefined);
@@ -36,9 +38,6 @@ export default function StartPage() {
       data: "",
     });
     const roomId = res.data.roomId;
-    if (userName) {
-      localStorage.setItem("userName", userName);
-    }
     if (roomId) {
       router.push(`/${roomId}`);
     }
@@ -49,9 +48,8 @@ export default function StartPage() {
       userName: userName,
     });
     if (userName && res.status === 200) {
-      localStorage.setItem("userName", userName);
+      router.push(`/${roomId}`);
     }
-    router.push(`/${roomId}`);
   };
 
   return (
@@ -99,7 +97,6 @@ export default function StartPage() {
           <Button
             onClick={onJoinRoom}
             className="w-full font-semibold bg-emerald-300 text-lg py-3 hover:bg-emerald-500"
-            disabled={error === undefined ? false : true}
           >
             Join Game
           </Button>

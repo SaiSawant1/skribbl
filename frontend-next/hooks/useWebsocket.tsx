@@ -11,9 +11,8 @@ export type Player = {
   isDrawing: boolean;
 };
 
-export const useWebSocket = () => {
+export const useWebSocket = (userName: string) => {
   const { roomId } = useParams();
-  const userName = localStorage.getItem("userName");
   const [isConnected, setIsConnected] = useState(false);
   const [error, setError] = useState<string | undefined>();
   const socketRef = useRef<WebSocket | null>(null);

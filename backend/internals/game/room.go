@@ -32,6 +32,7 @@ func NewRoom() *Room {
 		Unregister:      make(chan *Client),
 		Game:            NewGame(),
 		GameState:       "setup",
+		playerQueue:     datastructures.NewQueue[*Client](),
 	}
 }
 

@@ -4,6 +4,10 @@ type Queue[T any] struct {
 	items []T
 }
 
+func NewQueue[T any]() *Queue[T] {
+	return &Queue[T]{}
+}
+
 func (q *Queue[T]) Enqueue(item T) {
 	q.items = append(q.items, item)
 }

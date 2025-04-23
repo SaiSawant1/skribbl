@@ -1,0 +1,43 @@
+import { createStore, StoreApi } from "zustand/vanilla";
+
+export type UserState = {
+  userName: string;
+  isGuessing: boolean;
+  isWinner: boolean;
+  word: string;
+  roomId: string;
+  isAdmin: boolean;
+};
+
+export type UserActions = {
+  setUserName: (newUserName: string) => void;
+  setIsGuessing: (b: boolean) => void;
+  setIsWinner: () => void;
+  setWord: (newWord: string) => void;
+  setRoomId: (newRoomId: string) => void;
+};
+
+export type UserStore = UserState & UserActions;
+
+export const defaultInitState: UserState = {
+  userName: "",
+  isAdmin: false,
+  isGuessing: false,
+  isWinner: false,
+  word: "",
+  roomId: "",
+};
+
+export const createUserStore = (
+  initState: UserState = defaultInitState,
+): StoreApi<UserStore> => {
+  return createStore<UserStore>((set) => ({
+    ...initState,
+    setUserName: (newUserName: string) => set({ userName: newUserName }),
+    setIsGuessing: (b: boolean) => set({ isGuessing: b }),
+    setIsWinner: () => set({ isWinner: true }), // Example of setIsWinner setting a boolean
+    setWord: (newWord: string) => set({ word: newWord }),
+    setRoomId: (newRoomId: string) => set({ roomId: newRoomId }),
+  }));
+};
+

@@ -6,17 +6,19 @@ import DrawingCanvas from "@/components/DrawingCanvas";
 import WordDisplay from "@/components/WordDisplay";
 import { useWebSocket } from "@/hooks/useWebsocket";
 import { useParams, useRouter } from "next/navigation";
+import { useUserStore } from "@/components/user-store-provider";
 
 export default function GamePage() {
-  const { error, isConnected, messages, onSendMessage } = useWebSocket();
   const { roomId } = useParams();
   const router = useRouter();
-  const userName = localStorage.getItem("userName");
+  const { userName } = useUserStore((state) => state);
+  const { error, isConnected, messages, onSendMessage } = useWebSocket(
+    userName,
+  );
   if (!userName) {
     router.push("/start");
     return;
   }
-
   // Temporary mock data for PlayersList
   const mockPlayers = [
     { position: 1, userName: userName || "You", score: 0, isDrawing: false },
