@@ -1,15 +1,19 @@
 package game
 
 type Game struct {
-	Word       string
-	Round      int
-	MaxRoundes int
+	Word         string
+	CurrentRound int
+	MaxRoundes   int
+	MaxPlayer    int
+	WordLength   int
 }
 
 func NewGame() *Game {
 	return &Game{
-		Word:       "",
-		Round:      0,
-		MaxRoundes: 5,
+		Word:         "",
+		CurrentRound: 0,
+		MaxRoundes:   5,
+		MaxPlayer:    8,
+		WordLength:   4,
 	}
 }

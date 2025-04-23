@@ -14,6 +14,7 @@ export type UserActions = {
   setIsGuessing: (b: boolean) => void;
   setIsWinner: () => void;
   setWord: (newWord: string) => void;
+  setIsAdmin: (isAdmin: boolean) => void;
   setRoomId: (newRoomId: string) => void;
 };
 
@@ -38,6 +39,6 @@ export const createUserStore = (
     setIsWinner: () => set({ isWinner: true }), // Example of setIsWinner setting a boolean
     setWord: (newWord: string) => set({ word: newWord }),
     setRoomId: (newRoomId: string) => set({ roomId: newRoomId }),
+    setIsAdmin: (isAdmin: boolean) => set({ isAdmin: isAdmin }),
   }));
 };
-

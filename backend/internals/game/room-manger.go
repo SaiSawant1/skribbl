@@ -5,10 +5,6 @@ import (
 	"sync"
 )
 
-const (
-	MaxRoomCapacity = 8
-)
-
 var (
 	rooms           = make(map[string]*Room)
 	mu              sync.RWMutex
@@ -50,7 +46,7 @@ func CanJoinRoom(roomId string) error {
 		return ErrRoomNotFound
 	}
 
-	if len(room.Clients) >= MaxRoomCapacity {
+	if len(room.Clients) >= room.Game.MaxPlayer {
 		return ErrRoomFull
 	}
 

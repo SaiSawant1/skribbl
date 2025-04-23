@@ -10,8 +10,8 @@ import { useUserStore } from "@/components/user-store-provider";
 export default function StartPage() {
   const router = useRouter();
   const [error, setError] = useState<string | undefined>(undefined);
-  const { userName, setUserName, roomId, setRoomId } = useUserStore((state) =>
-    state
+  const { userName, setIsAdmin, setUserName, roomId, setRoomId } = useUserStore(
+    (state) => state,
   );
 
   const onUserName = (e: ChangeEvent<HTMLInputElement>) => {
@@ -39,6 +39,7 @@ export default function StartPage() {
     });
     const roomId = res.data.roomId;
     if (roomId) {
+      setIsAdmin(true);
       router.push(`/${roomId}`);
     }
   };

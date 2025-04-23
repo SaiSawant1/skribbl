@@ -1,4 +1,4 @@
-// Message types
+import { z } from "zod";
 
 /**
  * This will be Message that will handle chats and guess relative work
@@ -26,3 +26,26 @@ export type CanvasPayload = {
   type: string;
   isHidden: boolean;
 };
+
+/*
+ * These message will be send by the server or to the server
+ */
+
+// type:"word:picked"
+export type WordPickedPayload = {
+  userName: string;
+  word: string;
+  type: string;
+};
+
+export type WordPickPayload = {
+  userName: string;
+  words: string[];
+  type: string;
+};
+
+export const ConfigureFormScheam = z.object({
+  maxPlayer: z.number().int().gte(4),
+  wordLength: z.number().int().gte(4),
+  maxRounds: z.number().int().gte(4),
+});

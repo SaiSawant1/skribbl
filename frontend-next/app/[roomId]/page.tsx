@@ -7,11 +7,13 @@ import WordDisplay from "@/components/WordDisplay";
 import { useWebSocket } from "@/hooks/useWebsocket";
 import { useParams, useRouter } from "next/navigation";
 import { useUserStore } from "@/components/user-store-provider";
+import { ConfigureDialog } from "@/components/configure-dialog";
 
 export default function GamePage() {
   const { roomId } = useParams();
   const router = useRouter();
-  const { userName } = useUserStore((state) => state);
+  const { userName, isAdmin } = useUserStore((state) => state);
+
   const { error, isConnected, messages, onSendMessage } = useWebSocket(
     userName,
   );
@@ -88,6 +90,7 @@ export default function GamePage() {
           </div>
         </div>
       </div>
+      <ConfigureDialog isOpen={isAdmin} />
 
       {/* Error Display */}
       {error && (

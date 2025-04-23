@@ -42,11 +42,20 @@ type CanvasMessagePayload struct {
 }
 
 // Server Messages to control the game
+type BaseServerMessage struct {
+	Type     string          `json:"type"`
+	Data     json.RawMessage `json:"data"`
+	UserName string          `json:"userName"`
+}
 
-type WordPickPayload struct {
-	Type     string   `json:"type"`
-	Words    []string `json:"words"`
-	UserName string   `json:"userName"`
+type PickWordData struct {
+	Words []string `json:"words"`
+}
+
+type PickWordPayload struct {
+	Type     string       `json:"type"`
+	Data     PickWordData `json:"data"`
+	UserName string       `json:"userName"`
 }
 
 func (m *BasePayload) ConvertMessageToChatPayload(p []byte) ChatMessagePayload {
