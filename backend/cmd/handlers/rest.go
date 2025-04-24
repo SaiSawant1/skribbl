@@ -16,6 +16,14 @@ type JoinRoomRequest struct {
 	UserName string `json:"userName"`
 }
 
+type ConfigureRoomRequest struct {
+	RoomId     string `json:"roomId"`
+	UserName   string `json:"userName"`
+	MaxPlayers uint   `json:"maxPlayers"`
+	WordLength uint   `json:"wordLength"`
+	MaxRounds  uint   `json:"maxRounds"`
+}
+
 type ErrorResponse struct {
 	Error string `json:"error"`
 }
@@ -69,4 +77,32 @@ func JoinRoom(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.WriteHeader(http.StatusOK)
+}
+
+func UpdateConfiguration(w http.ResponseWriter, r *http.Request) {
+
+	if r.Method != http.MethodPost {
+		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	var configureRoomRequest ConfigureRoomRequest
+	if err := json.NewDecoder(r.Body).Decode(&configureRoomRequest); err != nil {
+		http.Error(w, "Invalid request body", http.StatusBadRequest)
+		return
+	}
+
+	if configureRoomRequest.RoomId == "" || configureRoomRequest.UserName == "" {
+		http.Error(w, "Room ID and username are required", http.StatusBadRequest)
+		return
+	}
+
+	if !game.UpdateConfiguration(configureRoomRequest.RoomId, configureRoomRequest.UserName, configureRoomRequest.MaxPlayers, configureRoomRequest.MaxRounds, configureRoomRequest.WordLength) {
+		http.Error(w, "Bad Requst failed to update room", http.StatusBadRequest)
+		return
+
+	}
+
+	w.WriteHeader(http.StatusOK)
+
 }

@@ -45,7 +45,7 @@ export type WordPickPayload = {
 };
 
 export const ConfigureFormScheam = z.object({
-  maxPlayer: z.number().int().gte(4),
+  maxPlayers: z.number().int().gte(4),
   wordLength: z.number().int().gte(4),
   maxRounds: z.number().int().gte(4),
 });

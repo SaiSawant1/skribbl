@@ -46,9 +46,29 @@ func CanJoinRoom(roomId string) error {
 		return ErrRoomNotFound
 	}
 
-	if len(room.Clients) >= room.Game.MaxPlayer {
+	if len(room.Clients) >= int(room.Game.MaxPlayer) {
 		return ErrRoomFull
 	}
 
 	return nil
+}
+
+func UpdateConfiguration(roomId string, userName string, maxPlayers uint, maxRounds uint, wordLength uint) bool {
+	room, ok := GetRoom(roomId)
+	if !ok {
+		return false
+	}
+
+	mu.Lock()
+	defer mu.Unlock()
+
+	if room.Admin.UserName != userName {
+		return false
+	}
+
+	room.Game.MaxPlayer = maxPlayers
+	room.Game.MaxRoundes = maxRounds
+	room.Game.WordLength = wordLength
+
+	return true
 }

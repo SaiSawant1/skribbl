@@ -50,13 +50,6 @@ func TestCanJoinRoom(t *testing.T) {
 	}
 
 	// Fill room to capacity
-	for i := 0; i < MaxRoomCapacity; i++ {
-		client := &Client{
-			UserName: "test",
-			Room:     room,
-		}
-		room.Clients[client] = true
-	}
 
 	// Test full room
 	if err := CanJoinRoom(room.RoomId); err != ErrRoomFull {

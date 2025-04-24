@@ -2,10 +2,10 @@ package game
 
 type Game struct {
 	Word         string
-	CurrentRound int
-	MaxRoundes   int
-	MaxPlayer    int
-	WordLength   int
+	CurrentRound uint
+	MaxRoundes   uint
+	MaxPlayer    uint
+	WordLength   uint
 }
 
 func NewGame() *Game {
