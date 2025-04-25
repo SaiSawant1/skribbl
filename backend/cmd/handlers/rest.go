@@ -24,6 +24,15 @@ type ConfigureRoomRequest struct {
 	MaxRounds  uint   `json:"maxRounds"`
 }
 
+type ConfigureRoomResponse struct {
+	RoomId        string `json:"roomId"`
+	AdminUserName string `json:"adminUserName"`
+	MaxPlayers    uint   `json:"maxPlayers"`
+	WordLength    uint   `json:"wordLength"`
+	MaxRounds     uint   `json:"maxRounds"`
+	GameState     string `json:"gameState"`
+}
+
 type ErrorResponse struct {
 	Error string `json:"error"`
 }
@@ -86,6 +95,7 @@ func UpdateConfiguration(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	w.Header().Set("Content-Type", "application/json")
 	var configureRoomRequest ConfigureRoomRequest
 	if err := json.NewDecoder(r.Body).Decode(&configureRoomRequest); err != nil {
 		http.Error(w, "Invalid request body", http.StatusBadRequest)
@@ -103,6 +113,17 @@ func UpdateConfiguration(w http.ResponseWriter, r *http.Request) {
 
 	}
 
-	w.WriteHeader(http.StatusOK)
+	room, ok := game.GetRoom(configureRoomRequest.RoomId)
+	if !ok {
+		http.Error(w, "Bad Requst failed to update room", http.StatusBadRequest)
+		return
+	}
+
+	response := ConfigureRoomResponse{RoomId: room.RoomId, AdminUserName: room.Admin.UserName, MaxPlayers: room.Game.MaxPlayers, WordLength: room.Game.WordLength, MaxRounds: room.Game.MaxRounds, GameState: room.GameState}
+
+	if err := json.NewEncoder(w).Encode(response); err != nil {
+		log.Printf("Error encoding response: %v", err)
+		http.Error(w, "Internal server error", http.StatusInternalServerError)
+	}
 
 }

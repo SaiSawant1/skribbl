@@ -4,6 +4,7 @@ import "./globals.css";
 import { DoodleBackground } from "@/components/dooble-background";
 import { ThemeProvider } from "@/components/theme-provider";
 import { UserStoreProvider } from "@/components/user-store-provider";
+import { GameStoreProvider } from "@/components/game-store-provider";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -37,9 +38,11 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           <DoodleBackground />
-          <UserStoreProvider>
-            {children}
-          </UserStoreProvider>
+          <GameStoreProvider>
+            <UserStoreProvider>
+              {children}
+            </UserStoreProvider>
+          </GameStoreProvider>
         </ThemeProvider>
       </body>
     </html>

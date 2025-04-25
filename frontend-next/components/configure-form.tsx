@@ -15,20 +15,36 @@ import {
   FormLabel,
   FormMessage,
 } from "./ui/form";
+import axios from "axios";
+import { useUserStore } from "./user-store-provider";
+import { useParams } from "next/navigation";
+import { GameStore } from "@/store/gameStore";
+import { useGameStore } from "./game-store-provider";
 
-interface ConfigureFormProps {
-  onSubmit: (data: z.infer<typeof ConfigureFormScheam>) => void;
-}
-
-export const ConfigureForm = ({ onSubmit }: ConfigureFormProps) => {
+export const ConfigureForm = () => {
+  const { roomId } = useParams();
+  const { userName } = useUserStore((state) => state);
+  const { setInfo } = useGameStore((state: GameStore) => state);
   const form = useForm<z.infer<typeof ConfigureFormScheam>>({
     resolver: zodResolver(ConfigureFormScheam),
     defaultValues: {
-      maxPlayer: 4,
+      maxPlayers: 4,
       wordLength: 4,
       maxRounds: 4,
     },
   });
+
+  const onSubmit = async (data: z.infer<typeof ConfigureFormScheam>) => {
+    const resp = await axios.post(`http://localhost:8080/${roomId}/configure`, {
+      maxPlayers: data.maxPlayers,
+      wordLength: data.wordLength,
+      maxRounds: data.maxRounds,
+      roomId: roomId,
+      userName: userName,
+    });
+    console.log(resp.data);
+    setInfo(resp.data);
+  };
 
   return (
     <Card className="relative overflow-hidden p-6">
@@ -46,7 +62,7 @@ export const ConfigureForm = ({ onSubmit }: ConfigureFormProps) => {
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
             <FormField
               control={form.control}
-              name="maxPlayer"
+              name="maxPlayers"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel className="text-gray-700 dark:text-gray-300">

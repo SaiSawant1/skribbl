@@ -1,6 +1,7 @@
 "use client";
 
 import { ConfigureForm } from "./configure-form";
+import { useGameStore } from "./game-store-provider";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "./ui/dialog";
 
 interface ConfigureDialogProps {
@@ -8,18 +9,16 @@ interface ConfigureDialogProps {
 }
 
 export const ConfigureDialog = ({ isOpen }: ConfigureDialogProps) => {
-  const onSubmit = () => {
-    console.log("submit");
-  };
+  const { gameState } = useGameStore((state) => state);
   return (
-    <Dialog open={isOpen}>
+    <Dialog open={isOpen && gameState === "WAITING"}>
       <DialogContent>
         <DialogHeader>
           <DialogTitle>
             Configure the Game
           </DialogTitle>
         </DialogHeader>
-        <ConfigureForm onSubmit={onSubmit} />
+        <ConfigureForm />
       </DialogContent>
     </Dialog>
   );
