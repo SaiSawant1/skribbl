@@ -1,24 +1,23 @@
 "use client";
 
 import { cn } from "@/lib/utils";
-import { ChatMessagePayload } from "@/types";
 import { useEffect, useRef, useState } from "react";
+import { useChatMessageStore } from "./chat-message-store-provider";
 
 interface ChatBoxProps {
-  messages: ChatMessagePayload[];
   onSendMessage: (message: string) => void;
   isDrawing: boolean;
   userName: string;
 }
 
 export default function ChatBox(
-  { messages, onSendMessage, isDrawing, userName }: ChatBoxProps,
+  { onSendMessage, isDrawing, userName }: ChatBoxProps,
 ) {
   const [message, setMessage] = useState("");
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const { messages } = useChatMessageStore((state) => state);
 
   useEffect(() => {
-    // Scroll to bottom when new messages arrive
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
@@ -42,7 +41,7 @@ export default function ChatBox(
             className={cn(
               "p-2 rounded-lg   dark:bg-red-700",
               userName === msg.userName &&
-              "flex justify-end dark:bg-violet-400",
+                "flex justify-end dark:bg-violet-400",
             )}
           >
             <span className="font-medium text-gray-900 dark:text-gray-100">

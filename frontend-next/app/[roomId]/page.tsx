@@ -14,7 +14,7 @@ export default function GamePage() {
   const router = useRouter();
   const { userName, isAdmin } = useUserStore((state) => state);
 
-  const { error, isConnected, messages, onSendMessage } = useWebSocket(
+  const { error, isConnected, onSendMessage } = useWebSocket(
     userName,
   );
   if (!userName) {
@@ -84,7 +84,6 @@ export default function GamePage() {
             <ChatBox
               onSendMessage={onSendMessage}
               isDrawing={false}
-              messages={messages}
               userName={userName}
             />
           </div>

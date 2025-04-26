@@ -71,5 +71,15 @@ func UpdateConfiguration(roomId string, userName string, maxPlayers uint, maxRou
 	room.Game.WordLength = wordLength
 	room.GameState = "START"
 
+	room.GamestateBroadcast <- GameStateMessage{
+		CurrPlayer:   room.CurrentPlayer.UserName,
+		RoomId:       room.RoomId,
+		MaxPlayers:   maxPlayers,
+		MaxRounds:    maxRounds,
+		CurrentRound: room.Game.CurrentRound,
+		WordLength:   wordLength,
+		Type:         "game:state",
+		GameState:    room.GameState,
+	}
 	return true
 }

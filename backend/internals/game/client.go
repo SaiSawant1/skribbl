@@ -9,20 +9,22 @@ import (
 )
 
 type Client struct {
-	UserName   string `json:"userName"`
-	Conn       *websocket.Conn
-	ChatSend   chan ChatMessagePayload
-	CanvasSend chan CanvasMessagePayload
-	Room       *Room
+	UserName      string `json:"userName"`
+	Conn          *websocket.Conn
+	ChatSend      chan ChatMessagePayload
+	CanvasSend    chan CanvasMessagePayload
+	GameStateSend chan GameStateMessage
+	Room          *Room
 }
 
 func NewClient(conn *websocket.Conn, room *Room, userName string) *Client {
 	return &Client{
-		UserName:   userName,
-		Conn:       conn,
-		ChatSend:   make(chan ChatMessagePayload, 256), // Buffered channel to prevent blocking
-		CanvasSend: make(chan CanvasMessagePayload, 256),
-		Room:       room,
+		UserName:      userName,
+		Conn:          conn,
+		ChatSend:      make(chan ChatMessagePayload, 256), // Buffered channel to prevent blocking
+		CanvasSend:    make(chan CanvasMessagePayload, 256),
+		GameStateSend: make(chan GameStateMessage, 256),
+		Room:          room,
 	}
 }
 
@@ -92,6 +94,17 @@ func (c *Client) Write() {
 			if err := c.Conn.WriteJSON(msg); err != nil {
 				log.Printf("WebSocket write error: %v", err)
 				return
+			}
+		case msg, ok := <-c.GameStateSend:
+			if !ok {
+				// Channel was closed
+				c.Conn.WriteMessage(websocket.CloseMessage, []byte{})
+				return
+			}
+			if err := c.Conn.WriteJSON(msg); err != nil {
+				log.Printf("WebSocket write error: %v", err)
+				return
+
 			}
 		case <-ticker.C:
 			if err := c.Conn.WriteMessage(websocket.PingMessage, nil); err != nil {

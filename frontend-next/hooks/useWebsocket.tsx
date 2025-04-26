@@ -3,6 +3,7 @@
 import { ChatMessagePayload } from "@/types";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
+import { useMessages } from "./useMessages";
 
 export type Player = {
   userName: string;
@@ -17,7 +18,7 @@ export const useWebSocket = (userName: string) => {
   const [error, setError] = useState<string | undefined>();
   const socketRef = useRef<WebSocket | null>(null);
   const connectedRef = useRef<boolean>(false);
-  const [messages, setMessages] = useState<ChatMessagePayload[]>([]);
+  const { newMessage } = useMessages();
   const router = useRouter();
 
   useEffect(() => {
@@ -39,9 +40,9 @@ export const useWebSocket = (userName: string) => {
     };
 
     socket.onmessage = (e) => {
-      console.log(e.data);
       const msg = JSON.parse(e.data);
-      setMessages((prev) => [...prev, msg]);
+      console.log("onmessage", msg);
+      newMessage(msg);
     };
 
     socket.onclose = () => {
@@ -50,7 +51,7 @@ export const useWebSocket = (userName: string) => {
       connectedRef.current = false;
       router.push("/start");
     };
-  }, [roomId, userName, router]);
+  }, [roomId, userName, router, newMessage]);
 
   const onSendMessage = (message: string) => {
     if (!userName) {
@@ -65,5 +66,5 @@ export const useWebSocket = (userName: string) => {
     socketRef.current?.send(JSON.stringify(msg));
   };
 
-  return { isConnected, messages, error, onSendMessage };
+  return { isConnected, error, onSendMessage };
 };

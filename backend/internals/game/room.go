@@ -8,31 +8,33 @@ import (
 )
 
 type Room struct {
-	GameState       string
-	Admin           *Client
-	RoomId          string
-	Clients         map[*Client]bool
-	Game            *Game
-	playerQueue     *datastructures.Queue[*Client]
-	CurrentPlayer   *Client
-	Register        chan *Client
-	Unregister      chan *Client
-	ChatBroadcast   chan ChatMessagePayload
-	CanvasBroadcast chan CanvasMessagePayload
+	GameState          string
+	Admin              *Client
+	RoomId             string
+	Clients            map[*Client]bool
+	Game               *Game
+	playerQueue        *datastructures.Queue[*Client]
+	CurrentPlayer      *Client
+	Register           chan *Client
+	Unregister         chan *Client
+	ChatBroadcast      chan ChatMessagePayload
+	CanvasBroadcast    chan CanvasMessagePayload
+	GamestateBroadcast chan GameStateMessage
 }
 
 func NewRoom() *Room {
 	id := uuid.New().String()
 	return &Room{
-		RoomId:          id,
-		Clients:         make(map[*Client]bool),
-		ChatBroadcast:   make(chan ChatMessagePayload),
-		CanvasBroadcast: make(chan CanvasMessagePayload),
-		Register:        make(chan *Client),
-		Unregister:      make(chan *Client),
-		Game:            NewGame(),
-		GameState:       "WAITING",
-		playerQueue:     datastructures.NewQueue[*Client](),
+		RoomId:             id,
+		Clients:            make(map[*Client]bool),
+		Game:               NewGame(),
+		GameState:          "WAITING",
+		playerQueue:        datastructures.NewQueue[*Client](),
+		ChatBroadcast:      make(chan ChatMessagePayload),
+		CanvasBroadcast:    make(chan CanvasMessagePayload),
+		Register:           make(chan *Client),
+		Unregister:         make(chan *Client),
+		GamestateBroadcast: make(chan GameStateMessage),
 	}
 }
 
@@ -54,6 +56,8 @@ func (r *Room) run() {
 			delete(r.Clients, client)
 			close(client.ChatSend)
 			close(client.CanvasSend)
+			close(client.Room.GamestateBroadcast)
+			log.Printf("REMOVING CLIENT %s \n", client.UserName)
 			if len(r.Clients) == 0 {
 				RemoveRoom(r.RoomId)
 			}
@@ -67,6 +71,12 @@ func (r *Room) run() {
 			for client := range r.Clients {
 				if client.UserName != msg.UserName {
 					client.CanvasSend <- msg
+				}
+			}
+		case msg := <-r.GamestateBroadcast:
+			for client := range r.Clients {
+				if client.UserName != msg.CurrPlayer {
+					client.GameStateSend <- msg
 				}
 			}
 		}

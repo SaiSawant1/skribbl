@@ -1,4 +1,3 @@
-// src/providers/counter-store-provider.tsx
 "use client";
 
 import { createGameStore, GameStore } from "@/store/gameStore";
@@ -11,13 +10,13 @@ export const GameStoreContext = createContext<GameStoreApi | undefined>(
   undefined,
 );
 
-export interface UserStoreProviderProps {
+export interface GameStoreProviderProps {
   children: ReactNode;
 }
 
 export const GameStoreProvider = ({
   children,
-}: UserStoreProviderProps) => {
+}: GameStoreProviderProps) => {
   const storeRef = useRef<GameStoreApi | null>(null);
   if (storeRef.current === null) {
     storeRef.current = createGameStore();

@@ -58,6 +58,17 @@ type PickWordPayload struct {
 	UserName string       `json:"userName"`
 }
 
+type GameStateMessage struct {
+	Type         string `json:"type"`
+	CurrPlayer   string `json:"currPlayer"`
+	RoomId       string `json:"roomId"`
+	MaxPlayers   uint   `json:"maxPlayers"`
+	CurrentRound uint   `json:"currentRound"`
+	MaxRounds    uint   `json:"maxRounds"`
+	WordLength   uint   `json:"wordLength"`
+	GameState    string `json:"gameState"`
+}
+
 func (m *BasePayload) ConvertMessageToChatPayload(p []byte) ChatMessagePayload {
 	var chatMessagePayload ChatMessagePayload
 	if err := json.Unmarshal(p, &chatMessagePayload); err != nil {

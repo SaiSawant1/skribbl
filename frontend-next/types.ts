@@ -27,6 +27,17 @@ export type CanvasPayload = {
   isHidden: boolean;
 };
 
+export type GameStateMessage = {
+  type: string;
+  currPlayer: string;
+  roomId: string;
+  maxPlayers: number;
+  currentRound: number;
+  maxRounds: number;
+  wordLength: number;
+  gameState: string;
+};
+
 /*
  * These message will be send by the server or to the server
  */
