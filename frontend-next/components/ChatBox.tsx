@@ -3,6 +3,7 @@
 import { cn } from "@/lib/utils";
 import { useEffect, useRef, useState } from "react";
 import { useChatMessageStore } from "./chat-message-store-provider";
+import { useUserStore } from "./user-store-provider";
 
 interface ChatBoxProps {
   onSendMessage: (message: string) => void;
@@ -16,6 +17,7 @@ export default function ChatBox(
   const [message, setMessage] = useState("");
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const { messages } = useChatMessageStore((state) => state);
+  const { isGuessing } = useUserStore((state) => state);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -41,7 +43,7 @@ export default function ChatBox(
             className={cn(
               "p-2 rounded-lg   dark:bg-red-700",
               userName === msg.userName &&
-                "flex justify-end dark:bg-violet-400",
+              "flex justify-end dark:bg-violet-400",
             )}
           >
             <span className="font-medium text-gray-900 dark:text-gray-100">
@@ -65,7 +67,7 @@ export default function ChatBox(
         />
         <button
           type="submit"
-          disabled={isDrawing}
+          disabled={!isGuessing}
           className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 disabled:opacity-50 dark:bg-blue-600 dark:hover:bg-blue-700"
         >
           Send
