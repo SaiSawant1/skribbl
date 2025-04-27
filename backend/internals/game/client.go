@@ -3,6 +3,7 @@ package game
 import (
 	"encoding/json"
 	"log"
+	"math/rand"
 	"time"
 
 	"github.com/gorilla/websocket"
@@ -101,6 +102,9 @@ func (c *Client) Write() {
 				c.Conn.WriteMessage(websocket.CloseMessage, []byte{})
 				return
 			}
+
+			msg.Word = maskWords(msg.Word, int(msg.WordLength/2))
+
 			if err := c.Conn.WriteJSON(msg); err != nil {
 				log.Printf("WebSocket write error: %v", err)
 				return
@@ -112,4 +116,21 @@ func (c *Client) Write() {
 			}
 		}
 	}
+}
+
+func maskWords(word string, length int) string {
+	if len(word) == 0 {
+		return word
+	}
+	wordRunes := []rune(word)
+
+	r := rand.New(rand.NewSource(time.Now().UnixNano()))
+
+	v := r.Perm(len(wordRunes))[:length]
+
+	for _, idx := range v {
+		wordRunes[idx] = '_'
+	}
+
+	return string(wordRunes)
 }
