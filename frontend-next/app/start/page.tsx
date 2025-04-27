@@ -6,13 +6,20 @@ import { useRouter } from "next/navigation";
 import { ChangeEvent, useState } from "react";
 import axios from "axios";
 import { useUserStore } from "@/components/user-store-provider";
+import { useGameStore } from "@/components/game-store-provider";
 
 export default function StartPage() {
   const router = useRouter();
   const [error, setError] = useState<string | undefined>(undefined);
-  const { userName, setIsAdmin, setUserName, roomId, setRoomId } = useUserStore(
+  const {
+    userName,
+    setIsAdmin,
+    setUserName,
+    setIsGuessing,
+  } = useUserStore(
     (state) => state,
   );
+  const { roomId, setRoomId } = useGameStore((state) => state);
 
   const onUserName = (e: ChangeEvent<HTMLInputElement>) => {
     setError(undefined);
@@ -40,6 +47,8 @@ export default function StartPage() {
     const roomId = res.data.roomId;
     if (roomId) {
       setIsAdmin(true);
+      setIsGuessing(false);
+      setRoomId(roomId);
       router.push(`/${roomId}`);
     }
   };
@@ -49,6 +58,7 @@ export default function StartPage() {
       userName: userName,
     });
     if (userName && res.status === 200) {
+      setIsGuessing(true);
       router.push(`/${roomId}`);
     }
   };

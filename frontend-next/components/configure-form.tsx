@@ -21,7 +21,7 @@ import { useParams } from "next/navigation";
 import { GameStore } from "@/store/gameStore";
 import { useGameStore } from "./game-store-provider";
 
-export const ConfigureForm = () => {
+export const ConfigureForm = ({ closeForm }: { closeForm: () => void }) => {
   const { roomId } = useParams();
   const { userName, setIsGuessing } = useUserStore((state) => state);
   const { setInfo } = useGameStore((state: GameStore) => state);
@@ -42,8 +42,11 @@ export const ConfigureForm = () => {
       roomId: roomId,
       userName: userName,
     });
-    setInfo(resp.data);
-    setIsGuessing(false);
+    if (resp.data) {
+      setInfo(resp.data);
+      setIsGuessing(false);
+      closeForm();
+    }
   };
 
   return (

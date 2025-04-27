@@ -42,21 +42,26 @@ func (r *Room) run() {
 	for {
 		select {
 		case client := <-r.Register:
-			r.Clients[client] = true
-			// if the player is first make it admin and set him the current player
-			if r.playerQueue.IsEmpty() {
-				r.Admin = client
-				r.CurrentPlayer = client
+			if r.Clients[client] == false {
+				r.Clients[client] = true
+				// if the player is first make it admin and set him the current player
+				if r.playerQueue.IsEmpty() {
+					r.Admin = client
+					r.CurrentPlayer = client
+				}
+				r.playerQueue.Enqueue(client)
+				log.Printf("Client added to room %s", r.RoomId)
+
+			} else {
+				log.Printf("Client[ %s ] already added to room %s", client.UserName, r.RoomId)
 			}
-			r.playerQueue.Enqueue(client)
-			log.Printf("Client added to room %s", r.RoomId)
 
 		case client := <-r.Unregister:
 			// TODO: enqueue the player from queue
 			delete(r.Clients, client)
 			close(client.ChatSend)
 			close(client.CanvasSend)
-			close(client.Room.GamestateBroadcast)
+			close(client.GameStateSend)
 			log.Printf("REMOVING CLIENT %s \n", client.UserName)
 			if len(r.Clients) == 0 {
 				RemoveRoom(r.RoomId)
@@ -75,7 +80,7 @@ func (r *Room) run() {
 			}
 		case msg := <-r.GamestateBroadcast:
 			for client := range r.Clients {
-				if client.UserName != msg.CurrPlayer {
+				if client.UserName != msg.CurrentPlayer {
 					client.GameStateSend <- msg
 				}
 			}

@@ -17,18 +17,23 @@ export const useMessages = () => {
       case "chat":
         const msg = data as ChatMessagePayload;
         setChatMessages(msg);
+        break;
       case "game:state":
         const gameStateInfo = data as GameStateMessage;
         setInfo({
-          adminUserName: gameStateInfo.currPlayer,
+          adminUserName: gameStateInfo.adminUserName,
           gameState: gameStateInfo.gameState,
           maxPlayers: gameStateInfo.maxPlayers,
           maxRounds: gameStateInfo.maxRounds,
           roomId: gameStateInfo.roomId,
           wordLength: gameStateInfo.wordLength,
+          currentPlayer: gameStateInfo.currPlayer,
+          word: gameStateInfo.word,
+          currentRound: gameStateInfo.currentRound,
         });
         setIsGuessing(true);
         setIsAdmin(false);
+        break;
     }
   };
 

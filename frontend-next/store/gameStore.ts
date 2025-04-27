@@ -1,6 +1,9 @@
 import { createStore, StoreApi } from "zustand/vanilla";
 
 export type GameState = {
+  currentPlayer: string;
+  currentRound: number;
+  word: string;
   adminUserName: string;
   maxPlayers: number;
   maxRounds: number;
@@ -11,11 +14,17 @@ export type GameState = {
 
 export type GameActions = {
   setInfo: (info: GameState) => void;
+  setWord: (newWord: string) => void;
+  setGameState: (newGameState: string) => void;
+  setRoomId: (newRoomId: string) => void;
 };
 
 export type GameStore = GameState & GameActions;
 
 export const defaultInitState: GameState = {
+  currentRound: 0,
+  currentPlayer: "",
+  word: "",
   adminUserName: "",
   maxPlayers: 4,
   maxRounds: 4,
@@ -37,6 +46,12 @@ export const createGameStore = (
         roomId: info.roomId,
         wordLength: info.wordLength,
         gameState: info.gameState,
+        word: info.word,
+        currentPlayer: info.currentPlayer,
+        currentRound: info.currentRound,
       }),
+    setWord: (newWord: string) => set({ word: newWord }),
+    setRoomId: (newRoomId: string) => set({ roomId: newRoomId }),
+    setGameState: (newGameState) => set({ gameState: newGameState }),
   }));
 };

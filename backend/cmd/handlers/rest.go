@@ -7,34 +7,12 @@ import (
 	"skribble-backend/internals/game"
 )
 
-type CreateRoomResponse struct {
-	RoomId string `json:"roomId"`
-}
-
-type JoinRoomRequest struct {
-	RoomId   string `json:"roomId"`
-	UserName string `json:"userName"`
-}
-
-type ConfigureRoomRequest struct {
-	RoomId     string `json:"roomId"`
-	UserName   string `json:"userName"`
-	MaxPlayers uint   `json:"maxPlayers"`
-	WordLength uint   `json:"wordLength"`
-	MaxRounds  uint   `json:"maxRounds"`
-}
-
-type ConfigureRoomResponse struct {
-	RoomId        string `json:"roomId"`
-	AdminUserName string `json:"adminUserName"`
-	MaxPlayers    uint   `json:"maxPlayers"`
-	WordLength    uint   `json:"wordLength"`
-	MaxRounds     uint   `json:"maxRounds"`
-	GameState     string `json:"gameState"`
-}
-
 type ErrorResponse struct {
 	Error string `json:"error"`
+}
+
+type CreateRoomResponse struct {
+	RoomId string `json:"roomId"`
 }
 
 func CreateRoom(w http.ResponseWriter, r *http.Request) {
@@ -53,6 +31,11 @@ func CreateRoom(w http.ResponseWriter, r *http.Request) {
 	}
 	log.Printf("ROOM CREATED roomID: %s", room.RoomId)
 
+}
+
+type JoinRoomRequest struct {
+	RoomId   string `json:"roomId"`
+	UserName string `json:"userName"`
 }
 
 func JoinRoom(w http.ResponseWriter, r *http.Request) {
@@ -88,6 +71,25 @@ func JoinRoom(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 }
 
+type ConfigureRoomRequest struct {
+	RoomId     string `json:"roomId"`
+	UserName   string `json:"userName"`
+	MaxPlayers uint   `json:"maxPlayers"`
+	WordLength uint   `json:"wordLength"`
+	MaxRounds  uint   `json:"maxRounds"`
+}
+
+type ConfigureRoomResponse struct {
+	RoomId        string `json:"roomId"`
+	AdminUserName string `json:"adminUserName"`
+	MaxPlayers    uint   `json:"maxPlayers"`
+	WordLength    uint   `json:"wordLength"`
+	MaxRounds     uint   `json:"maxRounds"`
+	GameState     string `json:"gameState"`
+	Word          string `json:"word"`
+	CurrentPlayer string `json:"currentPlayer"`
+}
+
 func UpdateConfiguration(w http.ResponseWriter, r *http.Request) {
 
 	if r.Method != http.MethodPost {
@@ -119,11 +121,54 @@ func UpdateConfiguration(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	response := ConfigureRoomResponse{RoomId: room.RoomId, AdminUserName: room.Admin.UserName, MaxPlayers: room.Game.MaxPlayers, WordLength: room.Game.WordLength, MaxRounds: room.Game.MaxRounds, GameState: room.GameState}
+	response := ConfigureRoomResponse{
+		RoomId:        room.RoomId,
+		AdminUserName: room.Admin.UserName,
+		MaxPlayers:    room.Game.MaxPlayers,
+		WordLength:    room.Game.WordLength,
+		MaxRounds:     room.Game.MaxRounds,
+		GameState:     room.GameState,
+		Word:          room.Game.Word,
+		CurrentPlayer: room.CurrentPlayer.UserName,
+	}
 
 	if err := json.NewEncoder(w).Encode(response); err != nil {
 		log.Printf("Error encoding response: %v", err)
 		http.Error(w, "Internal server error", http.StatusInternalServerError)
 	}
 
+}
+
+type SetWordRequest struct {
+	RoomId   string `json:"roomId"`
+	Word     string `json:"word"`
+	UserName string `json:"userName"`
+}
+
+func SetWord(w http.ResponseWriter, r *http.Request) {
+
+	if r.Method != http.MethodPost {
+		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	var setWordRequest SetWordRequest
+	if err := json.NewDecoder(r.Body).Decode(&setWordRequest); err != nil {
+		http.Error(w, "Invalid request body", http.StatusBadRequest)
+		return
+	}
+
+	if setWordRequest.RoomId == "" || setWordRequest.UserName == "" || setWordRequest.Word == "" {
+		http.Error(w, "Room ID and username are required", http.StatusBadRequest)
+		return
+	}
+
+	if !game.SetWord(setWordRequest.RoomId, setWordRequest.UserName, setWordRequest.Word) {
+		http.Error(w, "Bad Requst failed to update room", http.StatusBadRequest)
+		return
+
+	}
+
+	w.WriteHeader(http.StatusOK)
 }

@@ -66,20 +66,54 @@ func UpdateConfiguration(roomId string, userName string, maxPlayers uint, maxRou
 		return false
 	}
 
+	room.CurrentPlayer = room.Admin
 	room.Game.MaxPlayers = maxPlayers
 	room.Game.MaxRounds = maxRounds
 	room.Game.WordLength = wordLength
+	room.GameState = "WAITING"
+
+	room.GamestateBroadcast <- GameStateMessage{
+		CurrentPlayer: userName,
+		RoomId:        room.RoomId,
+		MaxPlayers:    maxPlayers,
+		MaxRounds:     maxRounds,
+		CurrentRound:  room.Game.CurrentRound,
+		WordLength:    wordLength,
+		Type:          "game:state",
+		GameState:     room.GameState,
+		AdminUserName: room.Admin.UserName,
+	}
+	return true
+}
+
+func SetWord(roomId string, userName string, word string) bool {
+	room, ok := GetRoom(roomId)
+	if !ok {
+		return false
+	}
+
+	mu.Lock()
+	defer mu.Unlock()
+
+	if room.CurrentPlayer.UserName != userName {
+		return false
+	}
+
+	room.Game.Word = word
+
 	room.GameState = "START"
 
 	room.GamestateBroadcast <- GameStateMessage{
-		CurrPlayer:   room.CurrentPlayer.UserName,
-		RoomId:       room.RoomId,
-		MaxPlayers:   maxPlayers,
-		MaxRounds:    maxRounds,
-		CurrentRound: room.Game.CurrentRound,
-		WordLength:   wordLength,
-		Type:         "game:state",
-		GameState:    room.GameState,
+		Word:          word,
+		CurrentPlayer: room.CurrentPlayer.UserName,
+		RoomId:        room.RoomId,
+		MaxPlayers:    room.Game.MaxPlayers,
+		MaxRounds:     room.Game.MaxRounds,
+		CurrentRound:  room.Game.CurrentRound,
+		WordLength:    room.Game.WordLength,
+		Type:          "game:state",
+		GameState:     room.GameState,
 	}
+
 	return true
 }

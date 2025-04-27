@@ -14,6 +14,7 @@ func SetupRouter() *mux.Router {
 	r.HandleFunc("/create-room", CreateRoom).Methods("POST", "OPTIONS")
 	r.HandleFunc("/join-room", JoinRoom).Methods("POST", "OPTIONS")
 	r.HandleFunc("/{roomId}/configure", UpdateConfiguration).Methods("POST", "OPTIONS")
+	r.HandleFunc("/{roomId}/word", SetWord).Methods("POST", "OPTIONS")
 	r.HandleFunc("/ws", HandleWs).Methods("GET", "OPTIONS") // Changed to GET for WebSocket
 
 	return r

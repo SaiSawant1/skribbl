@@ -28,6 +28,7 @@ export type CanvasPayload = {
 };
 
 export type GameStateMessage = {
+  word: string;
   type: string;
   currPlayer: string;
   roomId: string;
@@ -36,6 +37,7 @@ export type GameStateMessage = {
   maxRounds: number;
   wordLength: number;
   gameState: string;
+  adminUserName: string;
 };
 
 /*

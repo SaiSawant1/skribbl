@@ -58,15 +58,19 @@ type PickWordPayload struct {
 	UserName string       `json:"userName"`
 }
 
+// serrver message Base
+
 type GameStateMessage struct {
-	Type         string `json:"type"`
-	CurrPlayer   string `json:"currPlayer"`
-	RoomId       string `json:"roomId"`
-	MaxPlayers   uint   `json:"maxPlayers"`
-	CurrentRound uint   `json:"currentRound"`
-	MaxRounds    uint   `json:"maxRounds"`
-	WordLength   uint   `json:"wordLength"`
-	GameState    string `json:"gameState"`
+	AdminUserName string `json:"adminUserName"`
+	Word          string `json:"word"`
+	Type          string `json:"type"`
+	CurrentPlayer string `json:"currentPlayer"`
+	RoomId        string `json:"roomId"`
+	MaxPlayers    uint   `json:"maxPlayers"`
+	CurrentRound  uint   `json:"currentRound"`
+	MaxRounds     uint   `json:"maxRounds"`
+	WordLength    uint   `json:"wordLength"`
+	GameState     string `json:"gameState"`
 }
 
 func (m *BasePayload) ConvertMessageToChatPayload(p []byte) ChatMessagePayload {

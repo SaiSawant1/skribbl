@@ -41,12 +41,10 @@ export const useWebSocket = (userName: string) => {
 
     socket.onmessage = (e) => {
       const msg = JSON.parse(e.data);
-      console.log("onmessage", msg);
       newMessage(msg);
     };
 
     socket.onclose = () => {
-      console.log("socket closed");
       setIsConnected(false);
       connectedRef.current = false;
       router.push("/start");
