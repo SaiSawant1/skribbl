@@ -2,6 +2,7 @@ package game
 
 import (
 	"errors"
+	"strings"
 	"sync"
 )
 
@@ -99,12 +100,12 @@ func SetWord(roomId string, userName string, word string) bool {
 		return false
 	}
 
-	room.Game.Word = word
+	room.Game.Word = strings.ToUpper(word)
 
 	room.GameState = "START"
 
 	room.GamestateBroadcast <- GameStateMessage{
-		Word:          word,
+		Word:          room.Game.Word,
 		CurrentPlayer: room.CurrentPlayer.UserName,
 		RoomId:        room.RoomId,
 		MaxPlayers:    room.Game.MaxPlayers,

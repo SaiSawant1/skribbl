@@ -3,6 +3,7 @@ package game
 import (
 	"log"
 	datastructures "skribble-backend/internals/data-structures"
+	"strings"
 
 	"github.com/google/uuid"
 )
@@ -69,6 +70,11 @@ func (r *Room) run() {
 
 		case msg := <-r.ChatBroadcast:
 			for client := range r.Clients {
+				// check if message data has answer
+				isCorrectGuess := CheckWord(msg.Data.Message, r)
+				if isCorrectGuess {
+					msg.Data.Message = "YOUR GUESS WAS CORRECT"
+				}
 				client.ChatSend <- msg
 			}
 
@@ -86,4 +92,15 @@ func (r *Room) run() {
 			}
 		}
 	}
+}
+
+func CheckWord(sentence string, room *Room) bool {
+	words := strings.Fields(sentence)
+
+	for _, word := range words {
+		if strings.ToUpper(word) == room.Game.Word {
+			return true
+		}
+	}
+	return false
 }

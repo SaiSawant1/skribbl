@@ -4,16 +4,35 @@ import { useGameStore } from "./game-store-provider";
 import { useUserStore } from "./user-store-provider";
 import { Button } from "./ui/button";
 import axios from "axios";
+import { useEffect, useState } from "react";
 
 export default function WordDisplay() {
-  const { gameState, word, setWord, roomId, setGameState } = useGameStore((
+  const {
+    gameState,
+    word,
+    setWord,
+    roomId,
+    currentPlayer,
+    setGameState,
+    wordLength,
+  } = useGameStore((
     state,
   ) => state);
   const { isGuessing } = useUserStore((state) => state);
   const { userName } = useUserStore((state) => state);
+  const [wordOptions, setWordOptions] = useState<string[]>([]);
 
-  // Mock word options for the waiting state
-  const wordOptions = ["APPLE", "BANANA", "ORANGE"];
+  useEffect(() => {
+    const fetchData = async () => {
+      if (wordLength && !isGuessing && currentPlayer === userName) {
+        const resp = await axios.get(
+          `https://random-word-api.vercel.app/api?words=3&length=${wordLength}`,
+        );
+        setWordOptions(resp.data);
+      }
+    };
+    fetchData();
+  }, [currentPlayer, isGuessing, userName, wordLength]);
 
   const displayWord = (word: string) => {
     if (word !== "") {
