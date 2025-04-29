@@ -52,11 +52,10 @@ export default function GamePage() {
                 Game State: {gameState}
               </span>
               <span
-                className={`px-2 py-1 rounded-full text-sm ${
-                  isConnected
+                className={`px-2 py-1 rounded-full text-sm ${isConnected
                     ? "bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200"
                     : "bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200"
-                }`}
+                  }`}
               >
                 {isConnected ? "Connected" : "Disconnected"}
               </span>

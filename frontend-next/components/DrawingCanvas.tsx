@@ -16,9 +16,12 @@ export default function DrawingCanvas() {
 
     // Set canvas size
     const parent = canvas.parentElement;
+
     if (parent) {
       canvas.width = parent.clientWidth;
       canvas.height = parent.clientHeight;
+      canvas.style.width = `${parent.clientWidth}`;
+      canvas.style.height = `${parent.clientHeight}`;
     }
 
     // Get context
@@ -31,7 +34,9 @@ export default function DrawingCanvas() {
     context.strokeStyle = currentColor;
     context.lineWidth = currentWidth;
 
-    contextRef.current = context;
+    if (!contextRef.current) {
+      contextRef.current = context;
+    }
   }, [currentColor, currentWidth]);
 
   const startDrawing = (e: React.MouseEvent<HTMLCanvasElement>) => {
@@ -58,8 +63,6 @@ export default function DrawingCanvas() {
 
     context.lineTo(offsetX, offsetY);
     context.stroke();
-
-    // Send drawing data
   };
 
   const endDrawing = () => {
@@ -68,7 +71,6 @@ export default function DrawingCanvas() {
 
     const context = contextRef.current;
     if (!context) return;
-
     context.closePath();
   };
 
@@ -95,8 +97,7 @@ export default function DrawingCanvas() {
         onMouseDown={startDrawing}
         onMouseMove={draw}
         onMouseUp={endDrawing}
-        onMouseLeave={endDrawing}
-        className="w-full aspect-video bg-white rounded-lg cursor-pointer"
+        className="bg-white rounded-lg cursor-pointer"
       />
       <div className="flex justify-between items-center">
         <div className="flex items-center gap-4">
@@ -138,4 +139,3 @@ export default function DrawingCanvas() {
     </div>
   );
 }
-

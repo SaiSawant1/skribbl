@@ -41,7 +41,7 @@ export default function ChatBox(
           <div
             key={index}
             className={cn(
-              "p-2 rounded-lg   dark:bg-red-700",
+              "p-2 rounded-lg   dark:bg-violet-200",
               userName === msg.userName &&
               "flex justify-end dark:bg-violet-400",
             )}
