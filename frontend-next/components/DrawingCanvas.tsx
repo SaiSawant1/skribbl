@@ -1,19 +1,12 @@
-'use client';
+"use client";
 
-import { useEffect, useRef, useState } from 'react';
-import { DrawingData } from '@/types/websocket';
+import { useEffect, useRef, useState } from "react";
 
-interface DrawingCanvasProps {
-  isDrawing: boolean;
-  onDraw: (data: DrawingData) => void;
-  onClear: () => void;
-}
-
-export default function DrawingCanvas({ isDrawing, onDraw, onClear }: DrawingCanvasProps) {
+export default function DrawingCanvas() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const contextRef = useRef<CanvasRenderingContext2D | null>(null);
   const [isDrawingActive, setIsDrawingActive] = useState(false);
-  const [currentColor, setCurrentColor] = useState('#000000');
+  const [currentColor, setCurrentColor] = useState("#000000");
   const [currentWidth, setCurrentWidth] = useState(2);
   const [points, setPoints] = useState<{ x: number; y: number }[]>([]);
 
@@ -29,12 +22,12 @@ export default function DrawingCanvas({ isDrawing, onDraw, onClear }: DrawingCan
     }
 
     // Get context
-    const context = canvas.getContext('2d');
+    const context = canvas.getContext("2d");
     if (!context) return;
 
     // Configure context
-    context.lineCap = 'round';
-    context.lineJoin = 'round';
+    context.lineCap = "round";
+    context.lineJoin = "round";
     context.strokeStyle = currentColor;
     context.lineWidth = currentWidth;
 
@@ -42,12 +35,10 @@ export default function DrawingCanvas({ isDrawing, onDraw, onClear }: DrawingCan
   }, [currentColor, currentWidth]);
 
   const startDrawing = (e: React.MouseEvent<HTMLCanvasElement>) => {
-    if (!isDrawing) return;
-
     const { offsetX, offsetY } = e.nativeEvent;
     setIsDrawingActive(true);
     setPoints([{ x: offsetX, y: offsetY }]);
-    
+
     const context = contextRef.current;
     if (!context) return;
 
@@ -56,7 +47,7 @@ export default function DrawingCanvas({ isDrawing, onDraw, onClear }: DrawingCan
   };
 
   const draw = (e: React.MouseEvent<HTMLCanvasElement>) => {
-    if (!isDrawingActive || !isDrawing) return;
+    if (!isDrawingActive) return;
 
     const { offsetX, offsetY } = e.nativeEvent;
     const newPoints = [...points, { x: offsetX, y: offsetY }];
@@ -69,11 +60,6 @@ export default function DrawingCanvas({ isDrawing, onDraw, onClear }: DrawingCan
     context.stroke();
 
     // Send drawing data
-    onDraw({
-      points: newPoints,
-      color: currentColor,
-      width: currentWidth,
-    });
   };
 
   const endDrawing = () => {
@@ -92,7 +78,6 @@ export default function DrawingCanvas({ isDrawing, onDraw, onClear }: DrawingCan
     if (!canvas || !context) return;
 
     context.clearRect(0, 0, canvas.width, canvas.height);
-    onClear();
   };
 
   const handleColorChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -111,7 +96,7 @@ export default function DrawingCanvas({ isDrawing, onDraw, onClear }: DrawingCan
         onMouseMove={draw}
         onMouseUp={endDrawing}
         onMouseLeave={endDrawing}
-        className="w-full aspect-video bg-white rounded-lg cursor-crosshair"
+        className="w-full aspect-video bg-white rounded-lg cursor-pointer"
       />
       <div className="flex justify-between items-center">
         <div className="flex items-center gap-4">
@@ -146,11 +131,11 @@ export default function DrawingCanvas({ isDrawing, onDraw, onClear }: DrawingCan
         <button
           onClick={clearCanvas}
           className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 disabled:opacity-50"
-          disabled={!isDrawing}
         >
           Clear Canvas
         </button>
       </div>
     </div>
   );
-} 
+}
+

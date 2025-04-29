@@ -30,8 +30,8 @@ export default function GamePage() {
   ];
 
   // Temporary mock functions for DrawingCanvas
-  const handleDraw = () => { };
-  const handleClear = () => { };
+  //const handleDraw = () => {};
+  //const handleClear = () => {};
 
   // Temporary mock word
 
@@ -52,10 +52,11 @@ export default function GamePage() {
                 Game State: {gameState}
               </span>
               <span
-                className={`px-2 py-1 rounded-full text-sm ${isConnected
+                className={`px-2 py-1 rounded-full text-sm ${
+                  isConnected
                     ? "bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200"
                     : "bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200"
-                  }`}
+                }`}
               >
                 {isConnected ? "Connected" : "Disconnected"}
               </span>
@@ -75,11 +76,7 @@ export default function GamePage() {
           {/* Middle Column - Drawing Canvas */}
           <div className="w-full lg:w-2/4 bg-white dark:bg-gray-800 rounded-lg shadow-md p-2 sm:p-4">
             <WordDisplay />
-            <DrawingCanvas
-              isDrawing={false}
-              onDraw={handleDraw}
-              onClear={handleClear}
-            />
+            <DrawingCanvas />
           </div>
 
           {/* Right Column - Chat */}
