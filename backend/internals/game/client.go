@@ -16,6 +16,7 @@ type Client struct {
 	CanvasSend    chan CanvasMessagePayload
 	GameStateSend chan GameStateMessage
 	Room          *Room
+	Score         int
 }
 
 func NewClient(conn *websocket.Conn, room *Room, userName string) *Client {

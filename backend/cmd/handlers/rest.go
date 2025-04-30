@@ -11,6 +11,10 @@ type ErrorResponse struct {
 	Error string `json:"error"`
 }
 
+type CreateRoomRequest struct {
+	UserName string `json:"userName"`
+}
+
 type CreateRoomResponse struct {
 	RoomId string `json:"roomId"`
 }
@@ -18,6 +22,13 @@ type CreateRoomResponse struct {
 func CreateRoom(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	var createRoomRequest CreateRoomRequest
+
+	if err := json.NewDecoder(r.Body).Decode(&createRoomRequest); err != nil {
+		http.Error(w, "Invalid request body", http.StatusBadRequest)
 		return
 	}
 

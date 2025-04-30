@@ -8,6 +8,7 @@ import (
 )
 
 type Room struct {
+	ScorePool          int32
 	GameState          string
 	Admin              *Client
 	RoomId             string
@@ -25,6 +26,7 @@ type Room struct {
 func NewRoom() *Room {
 	id := uuid.New().String()
 	return &Room{
+		ScorePool:          100,
 		RoomId:             id,
 		Clients:            make(map[*Client]bool),
 		Game:               NewGame(),
@@ -72,6 +74,7 @@ func (r *Room) run() {
 				// check if message data has answer
 				isCorrectGuess := CheckWord(msg.Data.Message, r)
 				if isCorrectGuess {
+					client.Score += int(r.ScorePool)
 					msg.Data.Message = "YOUR GUESS WAS CORRECT"
 				}
 				client.ChatSend <- msg

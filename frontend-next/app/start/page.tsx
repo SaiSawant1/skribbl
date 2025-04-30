@@ -42,7 +42,7 @@ export default function StartPage() {
 
   const onCreateRoom = async () => {
     const res = await axios.post("http://localhost:8080/create-room", {
-      data: "",
+      userName: userName,
     });
     const roomId = res.data.roomId;
     if (roomId) {
@@ -53,6 +53,10 @@ export default function StartPage() {
     }
   };
   const onJoinRoom = async () => {
+    if (!userName) {
+      setError("Please enter user Name");
+      return;
+    }
     const res = await axios.post("http://localhost:8080/join-room", {
       roomId: roomId,
       userName: userName,
