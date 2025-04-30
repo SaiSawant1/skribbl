@@ -19,6 +19,7 @@ export default function GamePage() {
   const { error, isConnected, onSendMessage, onCanvasMessage } = useWebSocket(
     userName,
   );
+
   if (!userName) {
     router.push("/start");
     return;
@@ -41,7 +42,6 @@ export default function GamePage() {
 
   return (
     <div className="flex flex-col h-screen bg-gray-100 dark:bg-gray-900">
-      {/* Header */}
       <div className="bg-white dark:bg-gray-800 shadow-md p-4">
         <div className="container mx-auto">
           <div className="flex flex-col sm:flex-row justify-between items-center gap-2">
@@ -56,11 +56,10 @@ export default function GamePage() {
                 Game State: {gameState}
               </span>
               <span
-                className={`px-2 py-1 rounded-full text-sm ${
-                  isConnected
+                className={`px-2 py-1 rounded-full text-sm ${isConnected
                     ? "bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200"
                     : "bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200"
-                }`}
+                  }`}
               >
                 {isConnected ? "Connected" : "Disconnected"}
               </span>
@@ -69,21 +68,17 @@ export default function GamePage() {
         </div>
       </div>
 
-      {/* Main Content */}
       <div className="flex-1 container mx-auto p-2 sm:p-4">
         <div className="flex flex-col lg:flex-row gap-2 sm:gap-4 h-full">
-          {/* Left Column - Players List */}
           <div className="w-full lg:w-1/4 bg-white dark:bg-gray-800 rounded-lg shadow-md p-2 sm:p-4">
             <PlayersList players={mockPlayers} />
           </div>
 
-          {/* Middle Column - Drawing Canvas */}
           <div className="w-full lg:w-2/4 bg-white dark:bg-gray-800 rounded-lg shadow-md p-2 sm:p-4">
             <WordDisplay />
             <DrawingCanvas onMessageSend={handleCanvasMessageSend} />
           </div>
 
-          {/* Right Column - Chat */}
           <div className="w-full lg:w-1/4 bg-white dark:bg-gray-800 rounded-lg shadow-md p-2 sm:p-4">
             <ChatBox
               onSendMessage={onSendMessage}
@@ -95,7 +90,6 @@ export default function GamePage() {
       </div>
       <ConfigureDialog isAdmin={isAdmin} />
 
-      {/* Error Display */}
       {error && (
         <div className="fixed bottom-4 right-4 bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200 px-4 py-2 rounded-lg shadow-md">
           {error}

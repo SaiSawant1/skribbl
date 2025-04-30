@@ -7,7 +7,6 @@ export const useCanvasMessage = () => {
   const [isDrawingActive, setIsDrawingActive] = useState(false);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const contextRef = useRef<CanvasRenderingContext2D | null>(null);
-
   const { canvasMessage } = useMessageStore((state) => state);
 
   const onStart = useCallback((x: number, y: number): void => {
@@ -15,27 +14,22 @@ export const useCanvasMessage = () => {
 
     const context = contextRef.current;
     if (!context) return;
-
     context.beginPath();
     context.moveTo(x, y);
   }, []);
 
   const draw = useCallback((x: number, y: number): void => {
     if (!isDrawingActive) return;
-
     const context = contextRef.current;
     if (!context) return;
-
     context.lineTo(x, y);
     context.stroke();
   }, [isDrawingActive]);
 
   const onEnd = useCallback((): void => {
     setIsDrawingActive(false);
-
     const context = contextRef.current;
     if (!context) return;
-
     context.closePath();
   }, []);
 
@@ -43,7 +37,6 @@ export const useCanvasMessage = () => {
     const canvas = canvasRef.current;
     if (!canvas) return;
 
-    // Set canvas size
     const parent = canvas.parentElement;
     if (parent) {
       canvas.width = parent.clientWidth;
@@ -52,7 +45,6 @@ export const useCanvasMessage = () => {
       canvas.style.height = `${parent.clientHeight}px`;
     }
 
-    // Get context
     const context = canvas.getContext("2d");
     if (!context) return;
 

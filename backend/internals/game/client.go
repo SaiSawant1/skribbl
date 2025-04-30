@@ -22,7 +22,7 @@ func NewClient(conn *websocket.Conn, room *Room, userName string) *Client {
 	return &Client{
 		UserName:      userName,
 		Conn:          conn,
-		ChatSend:      make(chan ChatMessagePayload, 256), // Buffered channel to prevent blocking
+		ChatSend:      make(chan ChatMessagePayload, 256),
 		CanvasSend:    make(chan CanvasMessagePayload, 256),
 		GameStateSend: make(chan GameStateMessage, 256),
 		Room:          room,
@@ -56,7 +56,6 @@ func (c *Client) Read() {
 			break
 		}
 
-		// Process the message
 		if basePayload.Type == "chat" {
 			c.Room.ChatBroadcast <- basePayload.ConvertMessageToChatPayload(msg)
 		} else {
@@ -98,7 +97,6 @@ func (c *Client) Write() {
 			}
 		case msg, ok := <-c.GameStateSend:
 			if !ok {
-				// Channel was closed
 				c.Conn.WriteMessage(websocket.CloseMessage, []byte{})
 				return
 			}

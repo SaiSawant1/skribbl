@@ -49,18 +49,7 @@ type BaseServerMessage struct {
 	event string
 }
 
-type PickWordData struct {
-	Words []string `json:"words"`
-}
-
-type PickWordPayload struct {
-	Type     string       `json:"type"`
-	Data     PickWordData `json:"data"`
-	UserName string       `json:"userName"`
-}
-
 // serrver message Base
-
 type GameStateMessage struct {
 	AdminUserName string `json:"adminUserName"`
 	Word          string `json:"word"`
