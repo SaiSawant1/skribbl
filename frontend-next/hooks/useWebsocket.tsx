@@ -1,6 +1,6 @@
 "use client";
 
-import { ChatMessagePayload } from "@/types";
+import { CanvasPayload, ChatMessagePayload } from "@/types";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { useMessages } from "./useMessages";
@@ -41,6 +41,7 @@ export const useWebSocket = (userName: string) => {
 
     socket.onmessage = (e) => {
       const msg = JSON.parse(e.data);
+      console.log(msg);
       newMessage(msg);
     };
 
@@ -64,5 +65,30 @@ export const useWebSocket = (userName: string) => {
     socketRef.current?.send(JSON.stringify(msg));
   };
 
-  return { isConnected, error, onSendMessage };
+  const onCanvasMessage = (
+    x: number,
+    y: number,
+    type: string,
+    size: number,
+    tool: string,
+  ) => {
+    if (!userName) {
+      return;
+    }
+    const msg: CanvasPayload = {
+      userName: userName,
+      type: "canvas",
+      data: {
+        x: x,
+        y: y,
+        type: type,
+        size: size,
+        tool: tool,
+      },
+      isHidden: false,
+    };
+    socketRef.current?.send(JSON.stringify(msg));
+  };
+
+  return { onCanvasMessage, isConnected, error, onSendMessage };
 };

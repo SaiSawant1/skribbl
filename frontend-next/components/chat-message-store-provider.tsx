@@ -1,47 +1,44 @@
 "use client";
 
-import {
-  ChatMessageStore,
-  createChatMessageStore,
-} from "@/store/chatMessageStore";
+import { createMessageStore, MessageStore } from "@/store/messageStore";
 import { createContext, type ReactNode, useContext, useRef } from "react";
 import { useStore } from "zustand";
 
-export type ChatStoreStoreApi = ReturnType<typeof createChatMessageStore>;
+export type messageStoreStoreApi = ReturnType<typeof createMessageStore>;
 
-export const ChatMessageStoreContext = createContext<
-  ChatStoreStoreApi | undefined
+export const MessageStoreContext = createContext<
+  messageStoreStoreApi | undefined
 >(
   undefined,
 );
 
-export interface ChatMessageStoreProviderProps {
+export interface MessageStoreProviderProps {
   children: ReactNode;
 }
 
-export const ChatMessageStoreProvider = ({
+export const MessageStoreProvider = ({
   children,
-}: ChatMessageStoreProviderProps) => {
-  const storeRef = useRef<ChatStoreStoreApi | null>(null);
+}: MessageStoreProviderProps) => {
+  const storeRef = useRef<messageStoreStoreApi | null>(null);
   if (storeRef.current === null) {
-    storeRef.current = createChatMessageStore();
+    storeRef.current = createMessageStore();
   }
 
   return (
-    <ChatMessageStoreContext.Provider value={storeRef.current}>
+    <MessageStoreContext.Provider value={storeRef.current}>
       {children}
-    </ChatMessageStoreContext.Provider>
+    </MessageStoreContext.Provider>
   );
 };
 
-export const useChatMessageStore = <T,>(
-  selector: (store: ChatMessageStore) => T,
+export const useMessageStore = <T,>(
+  selector: (store: MessageStore) => T,
 ): T => {
-  const chatMessageStoreContext = useContext(ChatMessageStoreContext);
+  const messageStoreContext = useContext(MessageStoreContext);
 
-  if (!chatMessageStoreContext) {
+  if (!messageStoreContext) {
     throw new Error(`useUserStore must be used within GameStoreProvider`);
   }
 
-  return useStore(chatMessageStoreContext, selector);
+  return useStore(messageStoreContext, selector);
 };

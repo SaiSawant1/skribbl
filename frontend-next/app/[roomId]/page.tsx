@@ -16,7 +16,7 @@ export default function GamePage() {
   const { userName, isAdmin } = useUserStore((state) => state);
   const { gameState } = useGameStore((state) => state);
 
-  const { error, isConnected, onSendMessage } = useWebSocket(
+  const { error, isConnected, onSendMessage, onCanvasMessage } = useWebSocket(
     userName,
   );
   if (!userName) {
@@ -29,11 +29,15 @@ export default function GamePage() {
     { position: 2, userName: "Player 2", score: 0, isDrawing: false },
   ];
 
-  // Temporary mock functions for DrawingCanvas
-  //const handleDraw = () => {};
-  //const handleClear = () => {};
-
-  // Temporary mock word
+  const handleCanvasMessageSend = (
+    x: number,
+    y: number,
+    type: string,
+    size: number,
+    tool: string,
+  ) => {
+    onCanvasMessage(x, y, type, size, tool);
+  };
 
   return (
     <div className="flex flex-col h-screen bg-gray-100 dark:bg-gray-900">
@@ -52,10 +56,11 @@ export default function GamePage() {
                 Game State: {gameState}
               </span>
               <span
-                className={`px-2 py-1 rounded-full text-sm ${isConnected
+                className={`px-2 py-1 rounded-full text-sm ${
+                  isConnected
                     ? "bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200"
                     : "bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200"
-                  }`}
+                }`}
               >
                 {isConnected ? "Connected" : "Disconnected"}
               </span>
@@ -75,7 +80,7 @@ export default function GamePage() {
           {/* Middle Column - Drawing Canvas */}
           <div className="w-full lg:w-2/4 bg-white dark:bg-gray-800 rounded-lg shadow-md p-2 sm:p-4">
             <WordDisplay />
-            <DrawingCanvas />
+            <DrawingCanvas onMessageSend={handleCanvasMessageSend} />
           </div>
 
           {/* Right Column - Chat */}

@@ -22,6 +22,7 @@ type ChatData struct {
 type CanvasData struct {
 	X     float64 `json:"x"`
 	Y     float64 `json:"y"`
+	Type  string  `json:"type"`
 	Color string  `json:"color"`
 	Tool  string  `json:"tool"`
 	Size  float64 `json:"size"`
@@ -43,9 +44,9 @@ type CanvasMessagePayload struct {
 
 // Server Messages to control the game
 type BaseServerMessage struct {
-	Type     string          `json:"type"`
-	Data     json.RawMessage `json:"data"`
-	UserName string          `json:"userName"`
+	Type  string          `json:"type"`
+	Data  json.RawMessage `json:"data"`
+	event string
 }
 
 type PickWordData struct {

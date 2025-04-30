@@ -2,7 +2,7 @@
 
 import { cn } from "@/lib/utils";
 import { useEffect, useRef, useState } from "react";
-import { useChatMessageStore } from "./chat-message-store-provider";
+import { useMessageStore } from "./chat-message-store-provider";
 import { useUserStore } from "./user-store-provider";
 
 interface ChatBoxProps {
@@ -16,12 +16,12 @@ export default function ChatBox(
 ) {
   const [message, setMessage] = useState("");
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  const { messages } = useChatMessageStore((state) => state);
+  const { chatMessages } = useMessageStore((state) => state);
   const { isGuessing } = useUserStore((state) => state);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages]);
+  }, [chatMessages]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -37,7 +37,7 @@ export default function ChatBox(
         Chat
       </h2>
       <div className="flex-1 overflow-y-auto space-y-2 mb-4 flex flex-col justify-end">
-        {messages.map((msg, index) => (
+        {chatMessages.map((msg, index) => (
           <div
             key={index}
             className={cn(
@@ -46,10 +46,10 @@ export default function ChatBox(
               "flex justify-end dark:bg-violet-400",
             )}
           >
-            <span className="font-medium text-gray-900 dark:text-gray-100">
+            <span className="font-medium text-gray-900 dark:text-gray-900">
               {msg.userName}:
             </span>
-            <span className="ml-2 text-gray-700 dark:text-gray-300">
+            <span className="ml-2 text-gray-900 dark:text-gray-900">
               {msg.data.message}
             </span>
           </div>

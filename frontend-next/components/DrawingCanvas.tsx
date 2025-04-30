@@ -1,14 +1,29 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { useUserStore } from "./user-store-provider";
+import { WebSocketCanvas } from "./Canvas";
+import { useCanvasMessage } from "@/hooks/useCanvasMessages";
 
-export default function DrawingCanvas() {
+interface DrawingCanvasProps {
+  onMessageSend: (
+    x: number,
+    y: number,
+    type: string,
+    size: number,
+    tool: string,
+  ) => void;
+}
+
+export default function DrawingCanvas({ onMessageSend }: DrawingCanvasProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const contextRef = useRef<CanvasRenderingContext2D | null>(null);
   const [isDrawingActive, setIsDrawingActive] = useState(false);
   const [currentColor, setCurrentColor] = useState("#000000");
   const [currentWidth, setCurrentWidth] = useState(2);
   const [points, setPoints] = useState<{ x: number; y: number }[]>([]);
+  const { isGuessing } = useUserStore((state) => state);
+  const { canvasRef: websocketCanvasRef } = useCanvasMessage();
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -16,33 +31,35 @@ export default function DrawingCanvas() {
 
     // Set canvas size
     const parent = canvas.parentElement;
-
     if (parent) {
       canvas.width = parent.clientWidth;
       canvas.height = parent.clientHeight;
       canvas.style.width = `${parent.clientWidth}`;
       canvas.style.height = `${parent.clientHeight}`;
     }
-
     // Get context
     const context = canvas.getContext("2d");
     if (!context) return;
-
-    // Configure context
     context.lineCap = "round";
     context.lineJoin = "round";
-    context.strokeStyle = currentColor;
-    context.lineWidth = currentWidth;
-
     if (!contextRef.current) {
       contextRef.current = context;
     }
+  }, []);
+
+  useEffect(() => {
+    if (!contextRef.current) {
+      return;
+    }
+    contextRef.current.strokeStyle = currentColor;
+    contextRef.current.lineWidth = currentWidth;
   }, [currentColor, currentWidth]);
 
   const startDrawing = (e: React.MouseEvent<HTMLCanvasElement>) => {
     const { offsetX, offsetY } = e.nativeEvent;
     setIsDrawingActive(true);
     setPoints([{ x: offsetX, y: offsetY }]);
+    onMessageSend(offsetX, offsetY, "STARTDRAWING", 2, "pencil");
 
     const context = contextRef.current;
     if (!context) return;
@@ -57,6 +74,7 @@ export default function DrawingCanvas() {
     const { offsetX, offsetY } = e.nativeEvent;
     const newPoints = [...points, { x: offsetX, y: offsetY }];
     setPoints(newPoints);
+    onMessageSend(offsetX, offsetY, "DRAWING", 2, "pencil");
 
     const context = contextRef.current;
     if (!context) return;
@@ -68,6 +86,7 @@ export default function DrawingCanvas() {
   const endDrawing = () => {
     setIsDrawingActive(false);
     setPoints([]);
+    onMessageSend(0, 0, "ENDDRAWING", 2, "pencil");
 
     const context = contextRef.current;
     if (!context) return;
@@ -92,13 +111,17 @@ export default function DrawingCanvas() {
 
   return (
     <div className="flex flex-col gap-4">
-      <canvas
-        ref={canvasRef}
-        onMouseDown={startDrawing}
-        onMouseMove={draw}
-        onMouseUp={endDrawing}
-        className="bg-white rounded-lg cursor-pointer"
-      />
+      {isGuessing === true
+        ? <WebSocketCanvas canvasref={websocketCanvasRef} />
+        : (
+          <canvas
+            ref={canvasRef}
+            onMouseDown={startDrawing}
+            onMouseMove={draw}
+            onMouseUp={endDrawing}
+            className="bg-white rounded-lg cursor-pointer"
+          />
+        )}
       <div className="flex justify-between items-center">
         <div className="flex items-center gap-4">
           <div className="flex items-center gap-2">

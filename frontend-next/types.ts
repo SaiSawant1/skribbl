@@ -22,6 +22,7 @@ export type CanvasPayload = {
     y: number;
     size: number;
     tool: string;
+    type: string;
   };
   type: string;
   isHidden: boolean;
