@@ -35,13 +35,16 @@ export const ConfigureForm = ({ closeForm }: { closeForm: () => void }) => {
   });
 
   const onSubmit = async (data: z.infer<typeof ConfigureFormScheam>) => {
-    const resp = await axios.post(`http://localhost:8080/${roomId}/configure`, {
-      maxPlayers: data.maxPlayers,
-      wordLength: data.wordLength,
-      maxRounds: data.maxRounds,
-      roomId: roomId,
-      userName: userName,
-    });
+    const resp = await axios.post(
+      `${process.env.NEXT_PUBLIC_GO_SERVER}/${roomId}/configure`,
+      {
+        maxPlayers: data.maxPlayers,
+        wordLength: data.wordLength,
+        maxRounds: data.maxRounds,
+        roomId: roomId,
+        userName: userName,
+      },
+    );
     if (resp.data) {
       setInfo(resp.data);
       closeForm();

@@ -39,9 +39,12 @@ export default function StartPage() {
   };
 
   const onCreateRoom = async () => {
-    const res = await axios.post("http://localhost:8080/create-room", {
-      userName: userName,
-    });
+    const res = await axios.post(
+      `${process.env.NEXT_PUBLIC_GO_SERVER}/create-room`,
+      {
+        userName: userName,
+      },
+    );
     const roomId = res.data.roomId;
     if (roomId) {
       setRoomId(roomId);
@@ -53,10 +56,13 @@ export default function StartPage() {
       setError("Please enter user Name");
       return;
     }
-    const res = await axios.post("http://localhost:8080/join-room", {
-      roomId: roomId,
-      userName: userName,
-    });
+    const res = await axios.post(
+      `${process.env.NEXT_PUBLIC_GO_SERVER}/join-room`,
+      {
+        roomId: roomId,
+        userName: userName,
+      },
+    );
     if (userName && res.status === 200) {
       router.push(`/${roomId}`);
     }

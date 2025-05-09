@@ -44,11 +44,14 @@ export default function WordDisplay() {
   };
 
   const onWordSelect = async (word: string) => {
-    const resp = await axios.post(`http://localhost:8080/${roomId}/word`, {
-      userName: userName,
-      roomId: roomId,
-      word: word,
-    });
+    const resp = await axios.post(
+      `${process.env.NEXT_PUBLIC_GO_SERVER}/${roomId}/word`,
+      {
+        userName: userName,
+        roomId: roomId,
+        word: word,
+      },
+    );
     if (resp.status === 200) {
       setWord(word);
       setGameState("START");

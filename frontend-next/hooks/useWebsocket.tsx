@@ -29,7 +29,7 @@ export const useWebSocket = (userName: string) => {
       return;
     }
     const socket = new WebSocket(
-      `ws://localhost:8080/ws?roomId=${roomId}&userName=${userName}`,
+      `${process.env.NEXT_PUBLIC_GO_SERVER_WS}/ws?roomId=${roomId}&userName=${userName}`,
     );
     socketRef.current = socket;
 
