@@ -23,7 +23,7 @@ import { useGameStore } from "./game-store-provider";
 
 export const ConfigureForm = ({ closeForm }: { closeForm: () => void }) => {
   const { roomId } = useParams();
-  const { userName, setIsGuessing } = useUserStore((state) => state);
+  const { userName } = useUserStore((state) => state);
   const { setInfo } = useGameStore((state: GameStore) => state);
   const form = useForm<z.infer<typeof ConfigureFormScheam>>({
     resolver: zodResolver(ConfigureFormScheam),
@@ -44,7 +44,6 @@ export const ConfigureForm = ({ closeForm }: { closeForm: () => void }) => {
     });
     if (resp.data) {
       setInfo(resp.data);
-      setIsGuessing(false);
       closeForm();
     }
   };

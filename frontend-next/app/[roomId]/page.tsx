@@ -25,10 +25,6 @@ export default function GamePage() {
     return;
   }
   // Temporary mock data for PlayersList
-  const mockPlayers = [
-    { position: 1, userName: userName || "You", score: 0, isDrawing: false },
-    { position: 2, userName: "Player 2", score: 0, isDrawing: false },
-  ];
 
   const handleCanvasMessageSend = (
     x: number,
@@ -56,10 +52,11 @@ export default function GamePage() {
                 Game State: {gameState}
               </span>
               <span
-                className={`px-2 py-1 rounded-full text-sm ${isConnected
+                className={`px-2 py-1 rounded-full text-sm ${
+                  isConnected
                     ? "bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200"
                     : "bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200"
-                  }`}
+                }`}
               >
                 {isConnected ? "Connected" : "Disconnected"}
               </span>
@@ -71,7 +68,7 @@ export default function GamePage() {
       <div className="flex-1 container mx-auto p-2 sm:p-4">
         <div className="flex flex-col lg:flex-row gap-2 sm:gap-4 h-full">
           <div className="w-full lg:w-1/4 bg-white dark:bg-gray-800 rounded-lg shadow-md p-2 sm:p-4">
-            <PlayersList players={mockPlayers} />
+            <PlayersList />
           </div>
 
           <div className="w-full lg:w-2/4 bg-white dark:bg-gray-800 rounded-lg shadow-md p-2 sm:p-4">

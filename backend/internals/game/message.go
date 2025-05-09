@@ -49,6 +49,16 @@ type BaseServerMessage struct {
 	event string
 }
 
+type PlayerRankMessage struct {
+	Type      string               `json:"type"`
+	Positions []PlayerCurrentStats `json:"positions"`
+}
+
+type PlayerCurrentStats struct {
+	UserName string `json:"userName"`
+	Score    int    `json:"score"`
+}
+
 // serrver message Base
 type GameStateMessage struct {
 	AdminUserName string `json:"adminUserName"`

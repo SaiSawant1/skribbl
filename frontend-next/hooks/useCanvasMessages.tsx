@@ -9,77 +9,127 @@ export const useCanvasMessage = () => {
   const contextRef = useRef<CanvasRenderingContext2D | null>(null);
   const { canvasMessage } = useMessageStore((state) => state);
 
-  const onStart = useCallback((x: number, y: number): void => {
-    setIsDrawingActive(true);
+  // Current stroke properties
+  const [currentColor, setCurrentColor] = useState("#000000");
+  const [currentWidth, setCurrentWidth] = useState(2);
 
-    const context = contextRef.current;
-    if (!context) return;
-    context.beginPath();
-    context.moveTo(x, y);
-  }, []);
+  // Initialize canvas when it's available
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    const parent = canvas.parentElement;
+    if (!parent) return;
+
+    // Set canvas dimensions
+    canvas.width = parent.clientWidth;
+    canvas.height = parent.clientHeight;
+    canvas.style.width = `${parent.clientWidth}px`;
+    canvas.style.height = `${parent.clientHeight}px`;
+
+    // Setup context
+    const context = canvas.getContext("2d");
+    if (context) {
+      context.lineCap = "round";
+      context.lineJoin = "round";
+      context.strokeStyle = currentColor;
+      context.lineWidth = currentWidth;
+      contextRef.current = context;
+    }
+  }, [currentColor, currentWidth]);
+
+  const onStart = useCallback(
+    (x: number, y: number, size?: number, color?: string): void => {
+      setIsDrawingActive(true);
+
+      const context = contextRef.current;
+      if (!context) return;
+
+      // Update stroke properties if provided
+      if (color) {
+        setCurrentColor(color);
+        context.strokeStyle = color;
+      }
+
+      if (size) {
+        setCurrentWidth(size);
+        context.lineWidth = size;
+      }
+
+      context.beginPath();
+      context.moveTo(x, y);
+    },
+    [],
+  );
 
   const draw = useCallback((x: number, y: number): void => {
     if (!isDrawingActive) return;
+
     const context = contextRef.current;
     if (!context) return;
+
     context.lineTo(x, y);
     context.stroke();
   }, [isDrawingActive]);
 
   const onEnd = useCallback((): void => {
     setIsDrawingActive(false);
+
     const context = contextRef.current;
     if (!context) return;
+
     context.closePath();
   }, []);
 
-  useEffect((): void => {
+  const clearCanvas = useCallback((): void => {
     const canvas = canvasRef.current;
-    if (!canvas) return;
+    const context = contextRef.current;
 
-    const parent = canvas.parentElement;
-    if (parent) {
-      canvas.width = parent.clientWidth;
-      canvas.height = parent.clientHeight;
-      canvas.style.width = `${parent.clientWidth}px`;
-      canvas.style.height = `${parent.clientHeight}px`;
-    }
+    if (!canvas || !context) return;
 
-    const context = canvas.getContext("2d");
-    if (!context) return;
-
-    context.lineCap = "round";
-    context.lineJoin = "round";
-
-    if (!contextRef.current) {
-      contextRef.current = context;
-    }
-
-    contextRef.current.strokeStyle = "#000000";
-    contextRef.current.lineWidth = 2;
+    context.clearRect(0, 0, canvas.width, canvas.height);
   }, []);
 
+  // Handle incoming WebSocket canvas messages
   useEffect((): void => {
     if (!canvasMessage?.data) return;
 
     switch (canvasMessage.data.type) {
       case "STARTDRAWING":
-        onStart(canvasMessage.data.x, canvasMessage.data.y);
+        onStart(
+          canvasMessage.data.x,
+          canvasMessage.data.y,
+          canvasMessage.data.size,
+        );
         break;
+
       case "DRAWING":
         draw(canvasMessage.data.x, canvasMessage.data.y);
         break;
+
       case "ENDDRAWING":
         onEnd();
         break;
+
       case "TOOL":
         if (!contextRef.current) return;
-        // Tool switching logic could go here
+
+        // Handle tool changes (color or width)
+
+        if (canvasMessage.data.size) {
+          setCurrentWidth(canvasMessage.data.size);
+          contextRef.current.lineWidth = canvasMessage.data.size;
+        }
         break;
+
+      case "CLEAR":
+        clearCanvas();
+        break;
+
       default:
         break;
     }
-  }, [canvasMessage, draw, onEnd, onStart]);
+  }, [canvasMessage, draw, onEnd, onStart, clearCanvas]);
 
-  return { isDrawingActive, canvasRef, contextRef };
+  return { isDrawingActive, canvasRef, contextRef, currentColor, currentWidth };
 };

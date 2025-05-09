@@ -31,7 +31,7 @@ export type CanvasPayload = {
 export type GameStateMessage = {
   word: string;
   type: string;
-  currPlayer: string;
+  currentPlayer: string;
   roomId: string;
   maxPlayers: number;
   currentRound: number;
@@ -63,3 +63,13 @@ export const ConfigureFormScheam = z.object({
   wordLength: z.number().int().gte(4),
   maxRounds: z.number().int().gte(4),
 });
+
+export type PositionsMessage = {
+  type: string;
+  positions: PlayerRank[];
+};
+
+export type PlayerRank = {
+  userName: string;
+  score: number;
+};

@@ -13,9 +13,7 @@ export default function StartPage() {
   const [error, setError] = useState<string | undefined>(undefined);
   const {
     userName,
-    setIsAdmin,
     setUserName,
-    setIsGuessing,
   } = useUserStore(
     (state) => state,
   );
@@ -46,8 +44,6 @@ export default function StartPage() {
     });
     const roomId = res.data.roomId;
     if (roomId) {
-      setIsAdmin(true);
-      setIsGuessing(false);
       setRoomId(roomId);
       router.push(`/${roomId}`);
     }
@@ -62,7 +58,6 @@ export default function StartPage() {
       userName: userName,
     });
     if (userName && res.status === 200) {
-      setIsGuessing(true);
       router.push(`/${roomId}`);
     }
   };

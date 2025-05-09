@@ -15,6 +15,7 @@ type Client struct {
 	ChatSend      chan ChatMessagePayload
 	CanvasSend    chan CanvasMessagePayload
 	GameStateSend chan GameStateMessage
+	RankSend      chan PlayerRankMessage
 	Room          *Room
 	Score         int
 }
@@ -23,9 +24,10 @@ func NewClient(conn *websocket.Conn, room *Room, userName string) *Client {
 	return &Client{
 		UserName:      userName,
 		Conn:          conn,
-		ChatSend:      make(chan ChatMessagePayload, 256),
-		CanvasSend:    make(chan CanvasMessagePayload, 256),
-		GameStateSend: make(chan GameStateMessage, 256),
+		ChatSend:      make(chan ChatMessagePayload, 250),
+		CanvasSend:    make(chan CanvasMessagePayload, 250),
+		GameStateSend: make(chan GameStateMessage, 250),
+		RankSend:      make(chan PlayerRankMessage, 250),
 		Room:          room,
 	}
 }
@@ -102,13 +104,27 @@ func (c *Client) Write() {
 				return
 			}
 
-			msg.Word = maskWords(msg.Word, int(msg.WordLength/2))
+			if msg.CurrentPlayer != c.UserName {
+				msg.Word = maskWords(msg.Word, int(msg.WordLength/2))
+			}
 
 			if err := c.Conn.WriteJSON(msg); err != nil {
 				log.Printf("WebSocket write error: %v", err)
 				return
 
 			}
+		case msg, ok := <-c.RankSend:
+			if !ok {
+				if !ok {
+					c.Conn.WriteMessage(websocket.CloseMessage, []byte{})
+					return
+				}
+			}
+			if err := c.Conn.WriteJSON(msg); err != nil {
+				log.Printf("WebSocket write error: %v", err)
+				return
+			}
+
 		case <-ticker.C:
 			if err := c.Conn.WriteMessage(websocket.PingMessage, nil); err != nil {
 				return

@@ -18,21 +18,22 @@ export default function WordDisplay() {
   } = useGameStore((
     state,
   ) => state);
-  const { isGuessing } = useUserStore((state) => state);
+
   const { userName } = useUserStore((state) => state);
   const [wordOptions, setWordOptions] = useState<string[]>([]);
 
   useEffect(() => {
     const fetchData = async () => {
-      if (wordLength && !isGuessing && currentPlayer === userName) {
+      if (wordLength && currentPlayer === userName) {
         const resp = await axios.get(
           `https://random-word-api.vercel.app/api?words=3&length=${wordLength}`,
         );
+        console.log(resp.data);
         setWordOptions(resp.data);
       }
     };
     fetchData();
-  }, [currentPlayer, isGuessing, userName, wordLength]);
+  }, [currentPlayer, userName, wordLength]);
 
   const displayWord = (word: string) => {
     if (word !== "") {
@@ -56,7 +57,7 @@ export default function WordDisplay() {
 
   return (
     <>
-      {gameState === "WAITING" && !isGuessing
+      {gameState === "WAITING" && (currentPlayer == userName)
         ? (
           <>
             <div className="mb-4">
@@ -103,7 +104,7 @@ export default function WordDisplay() {
                 <div className="relative z-10">
                   <h2 className="text-xl font-bold text-gray-900 dark:text-gray-100 mb-3 flex items-center gap-2">
                     <span className="inline-block w-2 h-2 rounded-full bg-blue-500 dark:bg-blue-400" />
-                    {isGuessing ? "GUESS THE WORD" : "DRAW"}
+                    {!(currentPlayer == userName) ? "GUESS THE WORD" : "DRAW"}
                   </h2>
                   <div className="bg-gradient-to-r from-blue-50 to-purple-50 dark:from-gray-800 dark:to-gray-700 rounded-lg p-4 border border-gray-200 dark:border-gray-600 shadow-inner">
                     <div className="text-3xl font-mono text-center text-blue-600 dark:text-blue-400 tracking-wider">

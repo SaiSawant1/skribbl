@@ -7,6 +7,9 @@ interface WebSocketCanvasProps {
 }
 export const WebSocketCanvas = ({ canvasref }: WebSocketCanvasProps) => {
   return (
-    <canvas className="bg-white rouded-lg cursor-pointer" ref={canvasref} />
+    <canvas
+      className="bg-white h-full rounded-lg cursor-pointer"
+      ref={canvasref}
+    />
   );
 };

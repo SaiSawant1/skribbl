@@ -114,7 +114,40 @@ func SetWord(roomId string, userName string, word string) bool {
 		WordLength:    room.Game.WordLength,
 		Type:          "game:state",
 		GameState:     room.GameState,
+		AdminUserName: room.Admin.UserName,
 	}
 
 	return true
+}
+
+func ChangeTurn(r *Room) {
+	mu.Lock()
+	defer mu.Unlock()
+
+	currPlayer := r.PlayerQueue[0]
+	otherPlayers := r.PlayerQueue[1:]
+	r.PlayerQueue = otherPlayers
+	r.PlayerQueue = append(r.PlayerQueue, currPlayer)
+	r.CurrentPlayer = r.PlayerQueue[0]
+
+	r.GameState = "WAITING"
+	r.Game.Word = ""
+	r.Game.CurrentRound = r.Game.CurrentRound + 1
+	r.CorrectGuess = 0
+
+	r.GamestateBroadcast <- GameStateMessage{
+		Word:          r.Game.Word,
+		CurrentPlayer: r.CurrentPlayer.UserName,
+		RoomId:        r.RoomId,
+		MaxPlayers:    r.Game.MaxPlayers,
+		MaxRounds:     r.Game.MaxRounds,
+		CurrentRound:  r.Game.CurrentRound,
+		WordLength:    r.Game.WordLength,
+		Type:          "game:state",
+		GameState:     r.GameState,
+		AdminUserName: r.Admin.UserName,
+	}
+
+	go r.SendPositions()
+
 }

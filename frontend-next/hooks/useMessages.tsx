@@ -3,19 +3,30 @@
 import { useMessageStore } from "@/components/chat-message-store-provider";
 import { useGameStore } from "@/components/game-store-provider";
 import { useUserStore } from "@/components/user-store-provider";
-import { CanvasPayload, ChatMessagePayload, GameStateMessage } from "@/types";
+import {
+  CanvasPayload,
+  ChatMessagePayload,
+  GameStateMessage,
+  PositionsMessage,
+} from "@/types";
 
 export const useMessages = () => {
-  const { setChatMessages, setCanvasMessage } = useMessageStore((state) =>
+  const { setChatMessages, setPositions, setCanvasMessage } = useMessageStore((
+    state,
+  ) => state);
+  const { setIsGuessing, setIsAdmin, userName } = useUserStore((state) =>
     state
   );
-  const { setIsGuessing, setIsAdmin } = useUserStore((state) => state);
   const { setInfo } = useGameStore(
     (state) => state,
   );
 
   const newMessage = (
-    data: ChatMessagePayload | GameStateMessage | CanvasPayload,
+    data:
+      | ChatMessagePayload
+      | GameStateMessage
+      | CanvasPayload
+      | PositionsMessage,
   ) => {
     switch (data.type) {
       case "chat":
@@ -31,16 +42,34 @@ export const useMessages = () => {
           maxRounds: gameStateInfo.maxRounds,
           roomId: gameStateInfo.roomId,
           wordLength: gameStateInfo.wordLength,
-          currentPlayer: gameStateInfo.currPlayer,
+          currentPlayer: gameStateInfo.currentPlayer,
           word: gameStateInfo.word,
           currentRound: gameStateInfo.currentRound,
         });
-        setIsGuessing(true);
-        setIsAdmin(false);
+        if (gameStateInfo.adminUserName === userName) {
+          setIsAdmin(true);
+        } else {
+          setIsAdmin(false);
+        }
+
+        if (gameStateInfo.currentPlayer === userName) {
+          setIsGuessing(false);
+          console.log(false);
+        } else {
+          setIsGuessing(true);
+        }
         break;
       case "canvas":
         const canvasMsg = data as CanvasPayload;
+        console.log(canvasMsg);
         setCanvasMessage(canvasMsg);
+        break;
+      case "player:rank":
+        const playload = data as PositionsMessage;
+        console.log(playload.positions);
+        setPositions(playload.positions);
+        break;
+      default:
         break;
     }
   };
