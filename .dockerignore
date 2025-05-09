@@ -1,0 +1,56 @@
+# Ignore frontend build artifacts and dependencies
+/frontend-next/.next
+/frontend-next/node_modules
+/frontend-next/.env.local
+/frontend-next/.eslintcache
+/frontend-next/package-lock.json
+
+# Ignore backend build artifacts
+/backend/bin
+/backend/*.log
+/backend/.env
+/backend/.DS_Store
+
+# Git & Editor files
+.git
+.gitignore
+*.swp
+*.swo
+*.bak
+*.tmp
+.vscode
+.idea
+.DS_Store
+
+# Ignore system files
+
+Thumbs.db
+
+# Node/Next.js files
+/frontend-next/node_modules
+/frontend-next/.next
+/frontend-next/.env.local
+/frontend-next/.eslintcache
+/frontend-next/package-lock.json
+
+# Go build artifacts
+/backend/skribbl-server
+/backend/coverage
+/backend/*.log
+
+# System/editor files
+.git
+.gitignore
+*.swp
+*.swo
+*.bak
+*.tmp
+.vscode
+.idea
+.DS_Store
+
+# Test and temp files
+**/__pycache__/
+**/*.test.*
+**/*_test.go
+
